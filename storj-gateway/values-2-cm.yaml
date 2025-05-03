@@ -10,7 +10,7 @@ persistence:
   existingClaim: storj-config-pvc-test-01
   create: false
   accessMode: ReadWriteOnce
-  size: 1Gi
+  size: 5Mi
   storageClassName: ""
   mountPath: /root/.local/share/storj/gateway
 

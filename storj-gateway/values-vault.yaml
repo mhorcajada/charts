@@ -79,6 +79,10 @@ serviceAccount:
   create: true
   name: storj-gateway
 
+# Configuración opcional de ConfigMap para definir variables de entorno STORJ_ACCESS, STORJ_KEY y STORJ_SECRET.
+envConfigMap:
+  enabled: false
+
 # Volumen persistente para cache de Storj y almacenamiento temporal
 persistence:
   enabled: true

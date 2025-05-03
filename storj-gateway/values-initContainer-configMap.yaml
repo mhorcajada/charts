@@ -33,6 +33,10 @@ image:
   tag: 1d044e7-v1.10.0-go1.23.4
   pullPolicy: Always
 
+# Configuración opcional de ConfigMap para definir variables de entorno STORJ_ACCESS, STORJ_KEY y STORJ_SECRET.
+envConfigMap:
+  enabled: false
+
 # ConfigMap habilitado como fuente de configuración para storj
 # Se monta en solo lectura y luego se copia sobre el PVC desde un initContainer
 configMap:

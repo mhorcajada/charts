@@ -1,5 +1,20 @@
-# Número de réplicas del Deployment. Para producción se recomienda al menos 2.
+# Número de réplicas del Deployment
 replicaCount: 1
+
+# Historial de revisiones mantenido por el Deployment (para rollback)
+revisionHistoryLimit: 10
+
+# Tiempo máximo que puede tardar el rollout de una revisión
+progressDeadlineSeconds: 600
+
+# Tiempo de espera antes de forzar la terminación del pod
+terminationGracePeriodSeconds: 30
+
+# Política de resolución DNS utilizada dentro del pod
+dnsPolicy: ClusterFirst
+
+# Planificador usado para la asignación del pod al nodo
+schedulerName: default-scheduler
 
 # Imagen oficial del gateway de Storj
 image:

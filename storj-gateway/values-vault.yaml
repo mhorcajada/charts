@@ -1,0 +1,120 @@
+# Número de réplicas del Deployment
+replicaCount: 1
+
+# Historial de revisiones mantenido por el Deployment (para rollback)
+revisionHistoryLimit: 10
+
+# Tiempo máximo que puede tardar el rollout de una revisión
+progressDeadlineSeconds: 600
+
+# Tiempo de espera antes de forzar la terminación del pod
+terminationGracePeriodSeconds: 30
+
+# Política de resolución DNS utilizada dentro del pod
+dnsPolicy: ClusterFirst
+
+# Planificador usado para la asignación del pod al nodo
+schedulerName: default-scheduler
+
+# Estrategia de actualización rolling (actualización progresiva de pods)
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 25%         # Máximo de pods adicionales sobre el número deseado
+    maxUnavailable: 25%   # Máximo de pods no disponibles durante la actualización
+
+# Sobrescriben los nombres automáticos generados por Helm
+nameOverride: "storj"
+fullnameOverride: "storj-test"
+
+# Imagen Docker del Gateway de Storj
+image:
+  repository: docker.io/storjlabs/gateway
+  tag: 1d044e7-v1.10.0-go1.23.4
+  pullPolicy: Always  # Siempre intenta descargar la imagen (aunque esté en caché local)
+
+# Configuración de integración con HashiCorp Vault
+vault:
+  enabled: true  # Activa modo Vault
+  agentImage: hashicorp/vault:1.19.3  # Imagen del agente de Vault sidecar
+  caCertPath: /run/secrets/kubernetes.io/serviceaccount/ca.crt  # Ruta del certificado raíz
+  role: storj-gateway  # Rol de Vault para autenticación del pod (Kubernetes Auth)
+  secretPath: internal/data/storj-gateway/config  # Ruta secreta en Vault (KV v2)
+  template: |  # Template que Vault usará para inyectar como fichero env
+    {{ with secret "internal/data/storj-gateway/config" }}
+    export STORJ_ACCESS={{ .Data.data.access }}
+    export STORJ_KEY={{ index .Data.data "access-key" }}
+    export STORJ_SECRET={{ index .Data.data "secret-key" }}
+    {{ end }}
+
+# Variables de entorno adicionales
+env:
+  - name: STORJ_SERVER_ADDRESS
+    value: 0.0.0.0:7777
+
+# Comando base para el contenedor principal
+command:
+  - /bin/sh
+  - "-c"
+
+# Argumentos del contenedor: usa los secretos inyectados por Vault
+args:
+  - >
+    source /vault/secrets/storj-config.txt && exec /entrypoint run \
+    --access "$STORJ_ACCESS" \
+    --minio.access-key "$STORJ_KEY" \
+    --minio.secret-key "$STORJ_SECRET"
+
+# Recursos mínimos y límites del contenedor
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "200m"
+    memory: "256Mi"
+
+# Cuenta de servicio asociada al pod (con permiso para autenticarse en Vault)
+serviceAccount:
+  create: true
+  name: storj-gateway
+
+# Volumen persistente para cache de Storj y almacenamiento temporal
+persistence:
+  enabled: true
+  existingClaim: storj-config-pvc-test-01  # PVC ya existente (no se crea automáticamente)
+  mountPath: /root/.local/share/storj/gateway
+  accessMode: ReadWriteOnce
+  size: 5Mi
+  storageClassName: ""
+  create: false  # No se crea el PVC (modo producción con PVC predefinido)
+
+# Montaje de volumen necesario para que Storj persista su cache local
+volumeMounts:
+  - mountPath: /root/.local/share/storj/gateway
+    name: storj-config
+
+# Servicio expone el puerto del gateway Storj (7777) dentro del clúster
+service:
+  enabled: true
+  type: ClusterIP
+  port: 7777
+  targetPort: 7777
+
+# Anotaciones específicas que activan Vault Agent Injector
+podAnnotations:
+  vault.hashicorp.com/agent-image: hashicorp/vault:1.19.3  # Imagen del sidecar Vault Agent
+  vault.hashicorp.com/agent-inject: "true"  # Activa la inyección automática
+  vault.hashicorp.com/agent-inject-secret-storj-config.txt: internal/data/storj-gateway/config
+  vault.hashicorp.com/agent-inject-status: update  # Reinyecta si el secreto cambia
+  vault.hashicorp.com/agent-inject-template-storj-config.txt: |
+    {{ with secret "internal/data/storj-gateway/config" }}
+    export STORJ_ACCESS={{ .Data.data.access }}
+    export STORJ_KEY={{ index .Data.data "access-key" }}
+    export STORJ_SECRET={{ index .Data.data "secret-key" }}
+    {{ end }}
+  vault.hashicorp.com/ca-cert: /run/secrets/kubernetes.io/serviceaccount/ca.crt
+  vault.hashicorp.com/role: storj-gateway
+
+# Contexto de seguridad vacío (puede personalizarse según políticas del clúster)
+podSecurityContext: {}

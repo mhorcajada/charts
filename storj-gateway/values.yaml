@@ -1,0 +1,57 @@
+# Número de réplicas del Deployment. Para producción se recomienda al menos 2.
+replicaCount: 1
+
+# Imagen oficial del gateway de Storj
+image:
+  repository: docker.io/storjlabs/gateway  # Repositorio oficial de la imagen
+  tag: 1d044e7-v1.10.0-go1.23.4             # Versión específica y determinista
+  pullPolicy: Always                        # Política de descarga: Always, IfNotPresent o Never
+
+# === MODO 1: Configuración por variables de entorno ===
+# Utiliza un ConfigMap para definir STORJ_ACCESS, STORJ_KEY y STORJ_SECRET
+envConfigMap:
+  enabled: true
+  name: storj-env-config
+  data:
+    STORJ_ACCESS: REPLACE_WITH_ACCESS       # Token de acceso generado desde la web de Storj
+    STORJ_KEY: REPLACE_WITH_ACCESS_KEY      # Access Key del servicio MinIO compatible
+    STORJ_SECRET: REPLACE_WITH_SECRET_KEY   # Secret Key del servicio MinIO compatible
+
+# Comando base de ejecución del contenedor principal
+command:
+  - /bin/sh
+  - "-c"
+
+# Args: Ejecuta el binario gateway con las credenciales inyectadas por el ConfigMap
+args:
+  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_KEY" --minio.secret-key "$STORJ_SECRET"
+
+# Recursos mínimos recomendados para entorno de pruebas
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Configuración de la cuenta de servicio utilizada por el pod
+serviceAccount:
+  create: true                              # Si se debe crear una cuenta dedicada
+  name: storj-gateway                       # Nombre explícito para trazabilidad RBAC
+
+# Configuración del Service asociado al Deployment
+service:
+  enabled: true
+  type: ClusterIP                           # Tipo de servicio: ClusterIP, NodePort o LoadBalancer
+  port: 7777                                # Puerto externo expuesto
+  targetPort: 7777                          # Puerto del contenedor (interno)
+
+# Configuración del volumen persistente donde se guarda config.yaml y datos de gateway
+persistence:
+  enabled: true                             # Requiere PVC vinculado
+  existingClaim: storj-config-pvc-test-01   # Nombre del PVC preexistente
+  create: false                             # Si se debe crear automáticamente (solo si no existe)
+  mountPath: /root/.local/share/storj/gateway  # Path estándar donde storj guarda su configuración
+  accessMode: ReadWriteOnce                 # Modo de acceso típico para un solo pod
+  size: 5Mi                                 # Tamaño mínimo requerido por storj para almacenar config y caché

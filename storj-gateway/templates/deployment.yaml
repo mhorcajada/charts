@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "storj-gateway.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "storj-gateway.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds }}
+  selector:
+    matchLabels:
+      {{- include "storj-gateway.selectorLabels" . | nindent 6 }}
+  {{- if and (hasKey .Values "strategy") (hasKey .Values.strategy "type") }}
+  strategy:
+    type: {{ .Values.strategy.type }}
+    {{- if and (hasKey .Values.strategy "rollingUpdate") }}
+    rollingUpdate:
+      {{- if .Values.strategy.rollingUpdate.maxSurge }}
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
+      {{- end }}
+      {{- if .Values.strategy.rollingUpdate.maxUnavailable }}
+      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "storj-gateway.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "storj-gateway.serviceAccountName" . | quote }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+{{- if and (hasKey .Values "initContainer") (hasKey .Values.initContainer "enabled") (eq .Values.initContainer.enabled true) }}
+      initContainers:
+        - name: {{ .Values.initContainer.name }}
+          image: {{ .Values.initContainer.image }}
+          imagePullPolicy: {{ .Values.initContainer.pullPolicy }}
+          {{- if and (hasKey .Values.initContainer "env") (gt (len .Values.initContainer.env) 0) }}
+          env:
+            {{- toYaml .Values.initContainer.env | nindent 12 }}
+          {{- end }}
+          {{- if .Values.initContainer.command }}
+          command:
+            {{- toYaml .Values.initContainer.command | nindent 12 }}
+          {{- end }}
+          {{- if .Values.initContainer.args }}
+          args:
+            {{- toYaml .Values.initContainer.args | nindent 12 }}
+          {{- end }}
+          {{- if .Values.initContainer.resources }}
+          resources:
+            {{- toYaml .Values.initContainer.resources | nindent 12 }}
+          {{- end }}
+          {{- if and (hasKey .Values.initContainer "volumeMounts") (gt (len .Values.initContainer.volumeMounts) 0) }}
+          volumeMounts:
+            {{- toYaml .Values.initContainer.volumeMounts | nindent 12 }}
+          {{- end }}
+{{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.command }}
+          command:
+            {{- toYaml .Values.command | nindent 12 }}
+          {{- end }}
+          {{- if .Values.args }}
+          args:
+            {{- toYaml .Values.args | nindent 12 }}
+          {{- end }}
+          {{- if and (hasKey .Values "env") (gt (len .Values.env) 0) }}
+          env:
+            {{- toYaml .Values.env | nindent 12 }}
+          {{- end }}
+          {{- if and (hasKey .Values "envConfigMap") (typeIs "map[string]interface {}" .Values.envConfigMap) (hasKey .Values.envConfigMap "enabled") (eq .Values.envConfigMap.enabled true) (hasKey .Values.envConfigMap "name") }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.envConfigMap.name | quote }}
+          {{- end }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- if .Values.resources }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
+          {{- if and (hasKey .Values "volumeMounts") (gt (len .Values.volumeMounts) 0) }}
+          volumeMounts:
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+          {{- end }}
+      {{- if and .Values.persistence.enabled (or .Values.persistence.existingClaim .Values.persistence.create) }}
+      volumes:
+        - name: storj-config
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "storj-gateway.fullname" .) }}
+        {{- if and .Values.configMap (eq .Values.configMap.enabled true) }}
+        - name: storj-configmap
+          configMap:
+            name: {{ .Values.configMap.name | default (printf "%s-config" (include "storj-gateway.fullname" .)) }}
+            defaultMode: {{ .Values.configMap.defaultMode | default 420 }}
+        {{- end }}
+      {{- end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      dnsPolicy: {{ .Values.dnsPolicy }}
+      schedulerName: {{ .Values.schedulerName }}
+

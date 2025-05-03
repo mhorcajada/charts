@@ -1,0 +1,146 @@
+replicaCount: 1
+revisionHistoryLimit: 10
+progressDeadlineSeconds: 600
+terminationGracePeriodSeconds: 30
+dnsPolicy: ClusterFirst
+schedulerName: default-scheduler
+
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 25%
+    maxUnavailable: 25%
+
+nameOverride: "storj"
+fullnameOverride: "storj-test"
+
+image:
+  repository: docker.io/storjlabs/gateway
+  tag: 1d044e7-v1.10.0-go1.23.4
+  pullPolicy: Always
+
+vault:
+  enabled: true
+  agentImage: hashicorp/vault:1.19.3
+  caCertPath: /run/secrets/kubernetes.io/serviceaccount/ca.crt
+  role: storj-gateway
+  secretPath: internal/data/storj-gateway/config
+  template: |
+    {{ with secret "internal/data/storj-gateway/config" }}
+    export STORJ_ACCESS={{ .Data.data.access }}
+    export STORJ_KEY={{ index .Data.data "access-key" }}
+    export STORJ_SECRET={{ index .Data.data "secret-key" }}
+    {{ end }}
+
+env:
+  - name: STORJ_SERVER_ADDRESS
+    value: 0.0.0.0:7777
+
+command:
+  - /bin/sh
+  - "-c"
+
+args:
+  - >
+    source /vault/secrets/storj-config.txt && exec /entrypoint run \
+    --access "$STORJ_ACCESS" \
+    --minio.access-key "$STORJ_KEY" \
+    --minio.secret-key "$STORJ_SECRET"
+
+# args:
+#  - source /vault/secrets/storj-config.txt && exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_KEY" --minio.secret-key "$STORJ_SECRET"    
+
+# resources: {}
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "200m"
+    memory: "256Mi"
+
+serviceAccount:
+  create: true
+  name: storj-gateway
+
+initContainer:
+  enabled: true
+  name: copy-config
+  image: busybox
+  pullPolicy: Always
+  env:
+    - name: MY_VAR
+      value: hello
+  command: ["/bin/sh", "-c"]
+  args:
+    - |
+      if [ -f /root/.local/share/storj/gateway/config.yaml ]; then
+        cp -f /etc/storj-config/config.yaml /root/.local/share/storj/gateway/config.yaml
+        cat /root/.local/share/storj/gateway/config.yaml
+      fi
+  volumeMounts:
+    - mountPath: /root/.local/share/storj/gateway
+      name: storj-config
+    - mountPath: /etc/storj-config
+      name: storj-configmap
+  resources:
+    requests:
+      cpu: "25m"
+      memory: "32Mi"
+    limits:
+      cpu: "50m"
+      memory: "64Mi"
+
+persistence:
+  enabled: true
+  existingClaim: storj-config-pvc-test-01
+  mountPath: /root/.local/share/storj/gateway
+  accessMode: ReadWriteOnce
+  size: 5Mi
+  storageClassName: ""
+  create: false
+  # create: true  
+
+# configMap:
+#   enabled: false
+#   data: {}
+
+configMap:
+  enabled: true
+  name: storj-gateway-config
+  defaultMode: 420
+  mountPath: /etc/storj-config
+  data:
+    config.yaml: |
+      access: 15M6fjpDJPD7y9
+      minio.access-key: 3fbTqjR6kSQ1YjnP
+      minio.secret-key: MKtrxg
+
+# volumeMounts: []
+volumeMounts:
+  - mountPath: /root/.local/share/storj/gateway
+    name: storj-config
+  - mountPath: /etc/storj-config
+    name: storj-configmap
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 7777
+  targetPort: 7777
+
+podAnnotations:
+  vault.hashicorp.com/agent-image: hashicorp/vault:1.19.3
+  vault.hashicorp.com/agent-inject: "true"
+  vault.hashicorp.com/agent-inject-secret-storj-config.txt: internal/data/storj-gateway/config
+  vault.hashicorp.com/agent-inject-status: update
+  vault.hashicorp.com/agent-inject-template-storj-config.txt: |
+    {{ with secret "internal/data/storj-gateway/config" }}
+    export STORJ_ACCESS={{ .Data.data.access }}
+    export STORJ_KEY={{ index .Data.data "access-key" }}
+    export STORJ_SECRET={{ index .Data.data "secret-key" }}
+    {{ end }}
+  vault.hashicorp.com/ca-cert: /run/secrets/kubernetes.io/serviceaccount/ca.crt
+  vault.hashicorp.com/role: storj-gateway
+
+podSecurityContext: {}

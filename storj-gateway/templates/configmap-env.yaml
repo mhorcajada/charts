@@ -1,0 +1,17 @@
+{{- if and (hasKey .Values "envConfigMap") (typeIs "map[string]interface {}" .Values.envConfigMap) }}
+  {{- $cfg := .Values.envConfigMap }}
+  {{- if and (hasKey $cfg "enabled") (eq $cfg.enabled true) (hasKey $cfg "data") (gt (len $cfg.data) 0) }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $cfg.name | default (printf "%s-env-config" (include "storj-gateway.fullname" .)) }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "storj-gateway.labels" . | nindent 4 }}
+data:
+{{- range $key, $value := $cfg.data }}
+  {{ $key }}: "{{ $value }}"
+{{- end }}
+  {{- end }}
+{{- end }}

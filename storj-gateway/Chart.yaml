@@ -1,0 +1,22 @@
+apiVersion: v2
+name: storj-gateway
+description: A Helm chart for deploying Storj Gateway with Vault-injected secrets
+version: 0.1.0
+appVersion: "1.10.0"
+kubeVersion: ">= 1.21.0"
+keywords:
+  - storj
+  - gateway
+  - vault
+  - s3
+home: https://www.storj.io/
+sources:
+  - https://github.com/storj/storj
+maintainers:
+  - name: Miguel Horcajada
+    email: mhorcajada@gh.com
+    url: https://github.com/mhorcajada
+icon: https://www.storj.io/favicon.ico
+annotations:
+  category: storage
+

@@ -1,0 +1,138 @@
+# Número de réplicas del Deployment
+replicaCount: 1
+
+# Control de historial de revisiones y temporizadores del Deployment
+revisionHistoryLimit: 10
+progressDeadlineSeconds: 600
+terminationGracePeriodSeconds: 30
+dnsPolicy: ClusterFirst
+schedulerName: default-scheduler
+
+# Estrategia de actualización rolling
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 25%
+    maxUnavailable: 25%
+
+# Sobrescritura de nombres para evitar prefijos automáticos del release
+nameOverride: "storj"
+fullnameOverride: "storj-test"
+
+# Imagen oficial de storjlabs gateway
+image:
+  repository: docker.io/storjlabs/gateway
+  tag: 1d044e7-v1.10.0-go1.23.4
+  pullPolicy: Always
+
+# ConfigMap habilitado como fuente de configuración para storj
+# Se monta en solo lectura y luego se copia sobre el PVC desde un initContainer
+configMap:
+  enabled: true
+  name: storj-gateway-config
+  defaultMode: 420
+  mountPath: /etc/storj-config
+  data:
+    config.yaml: |
+      access: REPLACE_WITH_ACCESS
+      minio.access-key: REPLACE_WITH_ACCESS_KEY
+      minio.secret-key: REPLACE_WITH_SECRET_KEY
+
+# Variables de entorno opcionales
+env:
+  - name: STORJ_SERVER_ADDRESS
+    value: 0.0.0.0:7777
+
+# Comando base del contenedor principal
+command:
+  - /bin/sh
+  - "-c"
+
+# Args: storj leerá automáticamente config.yaml desde /root/.local/share/storj/gateway
+args:
+  - exec /entrypoint run
+
+# Recursos mínimos requeridos para un entorno de prueba
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "200m"
+    memory: "256Mi"
+
+# Cuenta de servicio personalizada
+serviceAccount:
+  create: true
+  name: storj-gateway
+
+# Montajes requeridos por initContainer y contenedor principal
+volumeMounts:
+  - mountPath: /root/.local/share/storj/gateway
+    name: storj-config
+  - mountPath: /etc/storj-config
+    name: storj-configmap
+
+# Volumen persistente requerido por storj para escribir su config.yaml
+# Esta ruta coincide con el path predeterminado usado por storj
+persistence:
+  enabled: true
+  existingClaim: storj-config-pvc-test-01
+  mountPath: /root/.local/share/storj/gateway
+  accessMode: ReadWriteOnce
+  size: 5Mi
+  storageClassName: ""
+  create: false
+
+# InitContainer que copia el fichero config.yaml desde el configMap
+# al volumen persistente RW esperado por storj
+initContainer:
+  enabled: true
+  name: copy-config
+  image: busybox
+  pullPolicy: Always
+  env: []
+  command:
+    - /bin/sh
+    - -c
+  args:
+    - |
+      cp -f /etc/storj-config/config.yaml /root/.local/share/storj/gateway/config.yaml
+      echo "✅ config.yaml copiado al volumen persistente"
+  volumeMounts:
+    - mountPath: /root/.local/share/storj/gateway
+      name: storj-config
+    - mountPath: /etc/storj-config
+      name: storj-configmap
+  resources:
+    requests:
+      cpu: "25m"
+      memory: "32Mi"
+    limits:
+      cpu: "50m"
+      memory: "64Mi"
+
+# Servicio expone el puerto 7777 como ClusterIP
+service:
+  enabled: true
+  type: ClusterIP
+  port: 7777
+  targetPort: 7777
+
+# Anotaciones para Vault (comentadas, no se usa en este despliegue)
+# podAnnotations: {}
+#   vault.hashicorp.com/agent-image: hashicorp/vault:1.19.3
+#   vault.hashicorp.com/agent-inject: "true"
+#   vault.hashicorp.com/agent-inject-secret-storj-config.txt: internal/data/storj-gateway/config
+#   vault.hashicorp.com/agent-inject-status: update
+#   vault.hashicorp.com/agent-inject-template-storj-config.txt: |
+#     {{ with secret "internal/data/storj-gateway/config" }}
+#     export STORJ_ACCESS={{ .Data.data.access }}
+#     export STORJ_KEY={{ index .Data.data "access-key" }}
+#     export STORJ_SECRET={{ index .Data.data "secret-key" }}
+#     {{ end }}
+#   vault.hashicorp.com/ca-cert: /run/secrets/kubernetes.io/serviceaccount/ca.crt
+#   vault.hashicorp.com/role: storj-gateway
+
+# Contexto de seguridad vacío
+podSecurityContext: {}

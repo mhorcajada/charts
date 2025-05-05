@@ -183,7 +183,7 @@ Interfaz principal de Filestash y panel de administración:
 
 | UI Principal | Panel Admin |
 |--------------|-------------|
-| ![UI](https://user-images.githubusercontent.com/472617/170874078-39ea8af1-860d-408f-88ad-1b0b15ac02be.png) | ![Admin](https://user-images.githubusercontent.com/472617/170874149-1ff6947a-731e-4346-b312-d8c7f93b8f6b.png) |
+| ![UI](https://www.filestash.app/img/screenshots/feature1.png) | ![Admin](https://www.filestash.app/img/screenshots/feature_sso.png) |
 
 #### ✅ Resultado
 Una vez desplegado, el panel será accesible en:

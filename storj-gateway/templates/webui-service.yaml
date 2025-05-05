@@ -1,0 +1,15 @@
+{{- if .Values.webUi.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "storj-gateway.fullname" . }}-webui
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ include "storj-gateway.name" . }}-webui
+  ports:
+    - port: 80
+      targetPort: 8334
+      protocol: TCP
+      name: http
+{{- end }}

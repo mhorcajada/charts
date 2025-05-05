@@ -1,10 +1,11 @@
-{{- if and .Values.envSecret (hasKey .Values.envSecret "enabled") .Values.envSecret.enabled }}
+{{- if .Values.webUi.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "storj-gateway.fullname" . }}-webui
   labels:
     app: {{ include "storj-gateway.name" . }}-webui
+    app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
   selector:
@@ -19,12 +20,13 @@ spec:
         fsGroup: 1000
       containers:
         - name: filestash
-          image: {{ .Values.webUi.image.repository }}:{{ .Values.webUi.image.tag }}
           image: >
-            {{- if .Values.webUi.image.digest -}}
-            {{ .Values.webUi.image.repository }}@{{ .Values.webUi.image.digest }}
-            {{- else -}}
-            {{ .Values.webUi.image.repository }}:{{ .Values.webUi.image.tag | default "latest" }}
+            {{- if .Values.webUi.image.digest }}
+              {{ .Values.webUi.image.repository }}@{{ .Values.webUi.image.digest }}
+            {{- else if .Values.webUi.image.tag }}
+              {{ .Values.webUi.image.repository }}:{{ .Values.webUi.image.tag }}
+            {{- else }}
+              {{ .Values.webUi.image.repository }}:latest
             {{- end }}
           ports:
             - containerPort: 8334

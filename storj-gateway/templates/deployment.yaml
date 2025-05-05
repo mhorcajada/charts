@@ -84,6 +84,11 @@ spec:
             - configMapRef:
                 name: {{ .Values.envConfigMap.name | quote }}
           {{- end }}
+          {{- if and (hasKey .Values "envSecret") (typeIs "map[string]interface {}" .Values.envSecret) (hasKey .Values.envSecret "enabled") (eq .Values.envSecret.enabled true) (hasKey .Values.envSecret "name") }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.envSecret.name | quote }}
+          {{- end }}
           ports:
             - containerPort: {{ .Values.service.port }}
               protocol: TCP

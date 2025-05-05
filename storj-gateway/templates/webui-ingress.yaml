@@ -1,0 +1,34 @@
+{{- if and .Values.webUi.enabled .Values.webUi.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "storj-gateway.fullname" . }}-webui
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    {{- if .Values.webUi.ingress.tls.enabled }}
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: {{ .Values.webUi.ingress.tls.issuer }}
+    {{- else }}
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.webUi.ingress.className }}
+  {{- if .Values.webUi.ingress.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ .Values.webUi.ingress.host }}
+      secretName: {{ .Values.webUi.ingress.tls.secretName }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.webUi.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "storj-gateway.fullname" . }}-webui
+                port:
+                  number: 80
+{{- end }}

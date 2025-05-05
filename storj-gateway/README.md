@@ -1,4 +1,4 @@
-# Storj Gateway Helm Chart - Documentación técnica (02-05-2025)
+# Storj Gateway Helm Chart con WebUI - Documentación técnica (05-05-2025)
 
 Este repositorio contiene un Helm Chart personalizado para desplegar un contenedor **Storj Gateway** configurado dinámicamente mediante tres modos posibles de aprovisionamiento de configuración:
 
@@ -6,6 +6,7 @@ Este repositorio contiene un Helm Chart personalizado para desplegar un contened
 - `Modo 2`: Configuración mediante `envFrom` con ConfigMap
 - `Modo 3`: Configuración mediante inyección automática de secretos desde Vault (Vault Agent Injector)
 - `Modo 4`: Configuración mediante `envFrom` con Secret
+- `Modo WebUI`: Configuración mediante `webUi.enabled: true` de interfaz web para gestionar Storj Gateway.
 
 El diseño de este chart permite seleccionar **exclusivamente** un modo por despliegue, respetando la filosofía _"one responsibility per deployment"_ y asegurando aislamiento de lógica en `values.yaml`.
 
@@ -134,6 +135,63 @@ args:
 
 ---
 
+### 🔹 Modo Web UI: Filestash (`webUi.enabled: true`)
+
+Este modo opcional permite desplegar el frontend **Filestash** como panel web para interactuar con el gateway Storj.
+Ideal para usuarios que requieren una interfaz gráfica de administración de ficheros.
+
+#### 📁 Secret necesario
+Filestash gestiona sus credenciales internamente, por lo que **no requiere un Secret adicional** para autenticación básica.
+
+La autenticación de acceso y administración se gestiona en el propio panel web de Filestash (login + zona de admin).
+No es necesario usar anotaciones `nginx.ingress.kubernetes.io/auth-type: basic`.
+
+#### 🧾 Configuración en `values.yaml`
+
+```yaml
+webUi:
+  enabled: true
+
+  image:
+    repository: machines/filestash
+    tag: "latest"   # Recomendado fijar un digest o versión estable
+
+  ingress:
+    enabled: true
+    className: nginx
+    host: filestash.cluster.local
+
+    tls:
+      enabled: true              # true para TLS, false para HTTP plano
+      issuer: vault-issuer       # Issuer de cert-manager (e.g. vault-issuer, letsencrypt-prod)
+      secretName: filestash-tls  # Nombre del Secret TLS
+
+  persistence:
+    enabled: true
+    create: true
+    existingClaim: filestash-config-pvc  # Si 'create' es false, debe existir este PVC
+    storageClassName: longhorn
+    size: 50Mi
+```
+
+#### 🔐 Seguridad
+- Acceso web protegido mediante **login nativo** de Filestash.
+- Zona de administración habilitada desde el propio UI (`/admin`), requiere usuario registrado con permisos.
+
+#### 📸 Capturas de pantalla (miniaturas)
+Interfaz principal de Filestash y panel de administración:
+
+| UI Principal | Panel Admin |
+|--------------|-------------|
+| ![UI](https://user-images.githubusercontent.com/472617/170874078-39ea8af1-860d-408f-88ad-1b0b15ac02be.png) | ![Admin](https://user-images.githubusercontent.com/472617/170874149-1ff6947a-731e-4346-b312-d8c7f93b8f6b.png) |
+
+#### ✅ Resultado
+Una vez desplegado, el panel será accesible en:
+
+- `http://filestash.cluster.local` (si `tls.enabled: false`)
+- `https://filestash.cluster.local` (si `tls.enabled: true` y certificado emitido por `vault-issuer`)
+
+---
 ## 🧪 Validaciones y pruebas
 
 Para cada modo, se ha validado:

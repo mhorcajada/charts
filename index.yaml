@@ -5,7 +5,7 @@ entries:
       category: storage
     apiVersion: v2
     appVersion: 1.10.0
-    created: "2025-05-05T03:34:47.559286525+02:00"
+    created: "2025-05-05T04:23:10.122478191+02:00"
     description: A Helm chart for deploying Storj Gateway with Vault-injected secrets
     digest: b0985ee334b13104d25d31948223fa463f696c120344de399bd11c591b125159
     home: https://www.storj.io/
@@ -30,7 +30,32 @@ entries:
       category: storage
     apiVersion: v2
     appVersion: 1.10.0
-    created: "2025-05-05T03:53:59.703085695+02:00"
+    created: "2025-05-05T04:23:10.119895917+02:00"
+    description: A Helm chart for deploying Storj Gateway with Vault-injected secrets
+    digest: 23fbf376d82f35f2e8492eb7fc571400d1b1e86e5be0294df7f58d8837110e2a
+    home: https://www.storj.io/
+    icon: https://www.storj.io/favicon.ico
+    keywords:
+    - storj
+    - gateway
+    - vault
+    - s3
+    kubeVersion: '>= 1.21.0'
+    maintainers:
+    - email: mhorcajada@gh.com
+      name: Miguel Horcajada
+      url: https://github.com/mhorcajada
+    name: storj-gateway
+    sources:
+    - https://github.com/storj/storj
+    urls:
+    - https://mhorcajada.github.io/charts/storj-gateway-0.1.1.tgz
+    version: 0.1.1
+  - annotations:
+      category: storage
+    apiVersion: v2
+    appVersion: 1.10.0
+    created: "2025-05-05T04:23:10.115661423+02:00"
     description: A Helm chart for deploying Storj Gateway with Vault-injected secrets
     digest: 1c68a757187036e063c32e19511fab1aca753f107ff7657d5f47495b445c663f
     home: https://www.storj.io/
@@ -51,4 +76,4 @@ entries:
     urls:
     - https://mhorcajada.github.io/charts/storj-gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2025-05-05T03:53:59.698908496+02:00"
+generated: "2025-05-05T04:23:10.111922663+02:00"

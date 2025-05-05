@@ -1,0 +1,38 @@
+{{- if and .Values.envSecret (hasKey .Values.envSecret "enabled") .Values.envSecret.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "storj-gateway.fullname" . }}-webui
+  labels:
+    app: {{ include "storj-gateway.name" . }}-webui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "storj-gateway.name" . }}-webui
+  template:
+    metadata:
+      labels:
+        app: {{ include "storj-gateway.name" . }}-webui
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: filestash
+          image: {{ .Values.webUi.image.repository }}:{{ .Values.webUi.image.tag }}
+          image: >
+            {{- if .Values.webUi.image.digest -}}
+            {{ .Values.webUi.image.repository }}@{{ .Values.webUi.image.digest }}
+            {{- else -}}
+            {{ .Values.webUi.image.repository }}:{{ .Values.webUi.image.tag | default "latest" }}
+            {{- end }}
+          ports:
+            - containerPort: 8334
+          volumeMounts:
+            - name: config
+              mountPath: /app/data/state/config
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ .Values.webUi.persistence.existingClaim }}
+{{- end }}

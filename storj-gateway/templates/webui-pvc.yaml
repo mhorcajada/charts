@@ -1,0 +1,13 @@
+{{- if and .Values.webUi.enabled .Values.webUi.persistence.enabled .Values.webUi.persistence.create }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.webUi.persistence.existingClaim }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.webUi.persistence.size }}
+  storageClassName: {{ .Values.webUi.persistence.storageClassName | quote }}
+{{- end }}

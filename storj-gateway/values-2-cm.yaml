@@ -25,8 +25,8 @@ envConfigMap:
   name: storj-env-config
   data:
     STORJ_ACCESS: REPLACE_WITH_ACCESS
-    STORJ_KEY: REPLACE_WITH_ACCESS_KEY
-    STORJ_SECRET: REPLACE_WITH_SECRET_KEY
+    STORJ_MINIO_ACCESS_KEY: REPLACE_WITH_ACCESS_KEY
+    STORJ_MINIO_SECRET_KEY: REPLACE_WITH_SECRET_KEY
 
 configMap:
   enabled: true
@@ -67,7 +67,7 @@ command:
   - "-c"
 
 args:
-  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_KEY" --minio.secret-key "$STORJ_SECRET"
+  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_MINIO_ACCESS_KEY" --minio.secret-key "$STORJ_MINIO_SECRET_KEY"
 
 service:
   enabled: true

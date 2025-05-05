@@ -33,7 +33,7 @@ image:
   tag: 1d044e7-v1.10.0-go1.23.4
   pullPolicy: Always
 
-# Configuración opcional de ConfigMap para definir variables de entorno STORJ_ACCESS, STORJ_KEY y STORJ_SECRET.
+# Configuración opcional de ConfigMap para definir variables de entorno STORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY.
 envConfigMap:
   enabled: false
 
@@ -140,8 +140,8 @@ service:
 #   vault.hashicorp.com/agent-inject-template-storj-config.txt: |
 #     {{ with secret "internal/data/storj-gateway/config" }}
 #     export STORJ_ACCESS={{ .Data.data.access }}
-#     export STORJ_KEY={{ index .Data.data "access-key" }}
-#     export STORJ_SECRET={{ index .Data.data "secret-key" }}
+#     export STORJ_MINIO_ACCESS_KEY={{ index .Data.data "access-key" }}
+#     export STORJ_MINIO_SECRET_KEY={{ index .Data.data "secret-key" }}
 #     {{ end }}
 #   vault.hashicorp.com/ca-cert: /run/secrets/kubernetes.io/serviceaccount/ca.crt
 #   vault.hashicorp.com/role: storj-gateway

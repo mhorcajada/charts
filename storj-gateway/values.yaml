@@ -23,14 +23,14 @@ image:
   pullPolicy: Always                        # Política de descarga: Always, IfNotPresent o Never
 
 # === MODO 1: Configuración por variables de entorno ===
-# Utiliza un ConfigMap para definir STORJ_ACCESS, STORJ_KEY y STORJ_SECRET
+# Utiliza un ConfigMap para definir STORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY
 envConfigMap:
   enabled: true
   name: storj-env-config
   data:
     STORJ_ACCESS: REPLACE_WITH_ACCESS       # Token de acceso generado desde la web de Storj
-    STORJ_KEY: REPLACE_WITH_ACCESS_KEY      # Access Key del servicio MinIO compatible
-    STORJ_SECRET: REPLACE_WITH_SECRET_KEY   # Secret Key del servicio MinIO compatible
+    STORJ_MINIO_ACCESS_KEY: REPLACE_WITH_ACCESS_KEY      # Access Key del servicio MinIO compatible
+    STORJ_MINIO_SECRET_KEY: REPLACE_WITH_SECRET_KEY   # Secret Key del servicio MinIO compatible
 
 # Comando base de ejecución del contenedor principal
 command:
@@ -39,7 +39,7 @@ command:
 
 # Args: Ejecuta el binario gateway con las credenciales inyectadas por el ConfigMap
 args:
-  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_KEY" --minio.secret-key "$STORJ_SECRET"
+  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_MINIO_ACCESS_KEY" --minio.secret-key "$STORJ_MINIO_SECRET_KEY"
 
 # Recursos mínimos recomendados para entorno de pruebas
 resources:

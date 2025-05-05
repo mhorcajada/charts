@@ -53,7 +53,7 @@ args:
 ### 🔹 Modo 2: `envFrom` + `ConfigMap`
 
 **Descripción**:
-- Las variables sensibles (`STORJ_ACCESS`, `STORJ_KEY`, `STORJ_SECRET`) se definen como claves de un `ConfigMap`.
+- Las variables sensibles (`STORJ_ACCESS`, `STORJ_MINIO_ACCESS_KEY`, `STORJ_MINIO_SECRET_KEY`) se definen como claves de un `ConfigMap`.
 - Se usan con `envFrom` para inyectarlas en el contenedor.
 - El binario `storj` recibe explícitamente los parámetros como argumentos CLI.
 
@@ -64,11 +64,11 @@ envConfigMap:
   name: storj-env-config
   data:
     STORJ_ACCESS: ACCESS_VALUE
-    STORJ_KEY: ACCESS_KEY
-    STORJ_SECRET: SECRET_KEY
+    STORJ_MINIO_ACCESS_KEY: ACCESS_KEY
+    STORJ_MINIO_SECRET_KEY: SECRET_KEY
 
 args:
-  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_KEY" --minio.secret-key "$STORJ_SECRET"
+  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_MINIO_ACCESS_KEY" --minio.secret-key "$STORJ_MINIO_SECRET_KEY"
 ```
 
 ---
@@ -90,13 +90,13 @@ vault:
   template: |
     {{ with secret "internal/data/storj-gateway/config" }}
     export STORJ_ACCESS={{ .Data.data.access }}
-    export STORJ_KEY={{ index .Data.data "access-key" }}
-    export STORJ_SECRET={{ index .Data.data "secret-key" }}
+    export STORJ_MINIO_ACCESS_KEY={{ index .Data.data "access-key" }}
+    export STORJ_MINIO_SECRET_KEY={{ index .Data.data "secret-key" }}
     {{ end }}
 
 args:
   - >
-    source /vault/secrets/storj-config.txt && exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_KEY" --minio.secret-key "$STORJ_SECRET"
+    source /vault/secrets/storj-config.txt && exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_MINIO_ACCESS_KEY" --minio.secret-key "$STORJ_MINIO_SECRET_KEY"
 ```
 
 **Anotaciones en `podAnnotations` generadas automáticamente**:
@@ -110,7 +110,7 @@ args:
 ## 🔹 Modo 4: `envFrom` + `Secret`
 
 **Descripción**:
-- Las variables sensibles (`STORJ_ACCESS`, `STORJ_KEY`, `STORJ_SECRET`) se definen como claves de un `Secret` tipo `Opaque`.
+- Las variables sensibles (`STORJ_ACCESS`, `STORJ_MINIO_ACCESS_KEY`, `STORJ_MINIO_SECRET_KEY`) se definen como claves de un `Secret` tipo `Opaque`.
 - Se inyectan automáticamente al contenedor usando `envFrom.secretRef`.
 - Este modo es ideal cuando los secretos son gestionados por GitOps, SealedSecrets, o herramientas externas.
 
@@ -121,11 +121,11 @@ envSecret:
   name: storj-env-secret
   data:
     STORJ_ACCESS: ACCESS_VALUE
-    STORJ_KEY: ACCESS_KEY
-    STORJ_SECRET: SECRET_KEY
+    STORJ_MINIO_ACCESS_KEY: ACCESS_KEY
+    STORJ_MINIO_SECRET_KEY: SECRET_KEY
 
 args:
-  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_KEY" --minio.secret-key "$STORJ_SECRET"
+  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_MINIO_ACCESS_KEY" --minio.secret-key "$STORJ_MINIO_SECRET_KEY"
 ```
 
 **Ventajas**:

@@ -29,7 +29,7 @@ https://mhorcajada.github.io/charts
 
 | Chart           | Versión | App Version | Descripción                               |
 |----------------|---------|-------------|-------------------------------------------|
-| storj-gateway  | 0.1.0   | 1.10.0      | Despliegue flexible del Gateway oficial de Storj |
+| storj-gateway  | 0.2.0   | 1.10.0      | Despliegue flexible del Gateway oficial de Storj |
 
 ---
 

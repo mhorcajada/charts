@@ -20,14 +20,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: filestash
-          image: >
-            {{- if .Values.webUi.image.digest }}
-              {{ .Values.webUi.image.repository }}@{{ .Values.webUi.image.digest }}
-            {{- else if .Values.webUi.image.tag }}
-              {{ .Values.webUi.image.repository }}:{{ .Values.webUi.image.tag }}
-            {{- else }}
-              {{ .Values.webUi.image.repository }}:latest
-            {{- end }}
+          image: {{- if .Values.webUi.image.digest }}{{ .Values.webUi.image.repository }}@{{ .Values.webUi.image.digest }}{{ else }}{{ .Values.webUi.image.repository }}:{{ .Values.webUi.image.tag | default "latest" }}{{ end }}
           ports:
             - containerPort: 8334
           volumeMounts:

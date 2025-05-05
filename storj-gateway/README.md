@@ -5,6 +5,7 @@ Este repositorio contiene un Helm Chart personalizado para desplegar un contened
 - `Modo 1`: Configuración mediante ConfigMap + initContainer
 - `Modo 2`: Configuración mediante `envFrom` con ConfigMap
 - `Modo 3`: Configuración mediante inyección automática de secretos desde Vault (Vault Agent Injector)
+- `Modo 4`: Configuración mediante `envFrom` con Secret
 
 El diseño de este chart permite seleccionar **exclusivamente** un modo por despliegue, respetando la filosofía _"one responsibility per deployment"_ y asegurando aislamiento de lógica en `values.yaml`.
 
@@ -105,6 +106,34 @@ args:
 
 ---
 
+## 🔹 Modo 4: `envFrom` + `Secret`
+
+**Descripción**:
+- Las variables sensibles (`STORJ_ACCESS`, `STORJ_KEY`, `STORJ_SECRET`) se definen como claves de un `Secret` tipo `Opaque`.
+- Se inyectan automáticamente al contenedor usando `envFrom.secretRef`.
+- Este modo es ideal cuando los secretos son gestionados por GitOps, SealedSecrets, o herramientas externas.
+
+**Estructura esperada en `values.yaml`**:
+```yaml
+envSecret:
+  enabled: true
+  name: storj-env-secret
+  data:
+    STORJ_ACCESS: ACCESS_VALUE
+    STORJ_KEY: ACCESS_KEY
+    STORJ_SECRET: SECRET_KEY
+
+args:
+  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_KEY" --minio.secret-key "$STORJ_SECRET"
+```
+
+**Ventajas**:
+- Mayor seguridad frente a ConfigMap.
+- Compatible con Vault Agent si prepopula el `Secret` vía controller externo.
+- Declarativo y compatible con Argo CD.
+
+---
+
 ## 🧪 Validaciones y pruebas
 
 Para cada modo, se ha validado:
@@ -120,6 +149,7 @@ Comando de validación por modo:
 helm template . -f values-envFrom-configMap.yaml
 helm template . -f values-initContainer-configMap.yaml
 helm template . -f values-vault.yaml
+helm template . -f values-envFrom-Secret.yaml
 ```
 
 Para comprobar sintaxis e inyección de variables:
@@ -178,7 +208,6 @@ Storj genera los siguientes ficheros:
 ```bash
 /root/.local/share/storj/gateway/
 ├── config.yaml
-├── storj-config.yaml
 ├── minio/
 └── lost+found/
 ```

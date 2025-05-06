@@ -1,12 +1,12 @@
-# Storj Gateway Helm Chart con WebUI - Documentación técnica (05-05-2025)
+# Storj Gateway Helm Chart con WebUI - Documentación técnica (06-05-2025)
 
-Este repositorio contiene un Helm Chart personalizado para desplegar un contenedor **Storj Gateway** configurado dinámicamente mediante tres modos posibles de aprovisionamiento de configuración:
+Este repositorio contiene un Helm Chart personalizado para desplegar un contenedor **Storj Gateway** configurado dinámicamente mediante varios modos posibles de aprovisionamiento de configuración:
 
-- `Modo 1`: Configuración mediante ConfigMap + initContainer
-- `Modo 2`: Configuración mediante `envFrom` con ConfigMap
-- `Modo 3`: Configuración mediante inyección automática de secretos desde Vault (Vault Agent Injector)
-- `Modo 4`: Configuración mediante `envFrom` con Secret
-- `Modo WebUI`: Configuración mediante `webUi.enabled: true` de interfaz web para gestionar Storj Gateway.
+- `Modo 1`: Configuración mediante configMap + initContainer.
+- `Modo 2`: Configuración mediante `envFrom` con configMap.
+- `Modo 3`: Configuración mediante inyección de secretos desde Hashicorp Vault (Vault Agent Injector).
+- `Modo 4`: Configuración mediante `envFrom` con Secret.
+- `Modo WebUI`: Configuración `webUi.enabled: true` habilita la interfaz web para gestión de ficheros en Storj.
 
 El diseño de este chart permite seleccionar **exclusivamente** un modo por despliegue, respetando la filosofía _"one responsibility per deployment"_ y asegurando aislamiento de lógica en `values.yaml`.
 
@@ -18,7 +18,7 @@ Cada modo está validado con `helm template` y `helm install --dry-run` para gar
 ### 🔹 Modo 1: `initContainer` + `configMap`
 
 **Descripción**:
-- Se monta un `ConfigMap` en solo lectura que contiene el `config.yaml` de configuración de Storj.
+- Se monta un `configMap` de solo lectura que contiene el `config.yaml` de configuración de Storj.
 - Un `initContainer` copia este fichero al volumen persistente (PVC) donde la aplicación lo espera.
 - Storj carga automáticamente `config.yaml` sin parámetros adicionales.
 
@@ -50,25 +50,25 @@ args:
 
 ---
 
-### 🔹 Modo 2: `envFrom` + `ConfigMap`
+### 🔹 Modo 2: `envFrom` + `configMap`
 
 **Descripción**:
-- Las variables sensibles (`STORJ_ACCESS`, `STORJ_KEY`, `STORJ_SECRET`) se definen como claves de un `ConfigMap`.
+- Las variables sensibles (`STORJ_ACCESS`, `STORJ_MINIO_ACCESS_KEY`, `STORJ_MINIO_SECRET_KEY`) se definen como claves de un `configMap`.
 - Se usan con `envFrom` para inyectarlas en el contenedor.
 - El binario `storj` recibe explícitamente los parámetros como argumentos CLI.
 
 **Estructura esperada en `values.yaml`**:
 ```yaml
-envConfigMap:
+envconfigMap:
   enabled: true
   name: storj-env-config
   data:
     STORJ_ACCESS: ACCESS_VALUE
-    STORJ_KEY: ACCESS_KEY
-    STORJ_SECRET: SECRET_KEY
+    STORJ_MINIO_ACCESS_KEY: ACCESS_KEY
+    STORJ_MINIO_SECRET_KEY: SECRET_KEY
 
 args:
-  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_KEY" --minio.secret-key "$STORJ_SECRET"
+  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_MINIO_ACCESS_KEY" --minio.secret-key "$STORJ_MINIO_SECRET_KEY"
 ```
 
 ---
@@ -76,33 +76,35 @@ args:
 ### 🔹 Modo 3: Vault Agent Injector
 
 **Descripción**:
-- Se usa `Vault` como backend secreto. El `Vault Agent Injector` inyecta dinámicamente un secreto como fichero plano.
+- Se usa `Hashicorp Vault` como backend de secretos. El `Vault Agent Injector` inyecta dinámicamente un secreto como fichero plano.
 - Se utiliza `source` para cargar las variables antes de ejecutar `storj`.
-- Evita usar `envFrom` o montar secretos estáticos.
+- Evita usar `envFrom`, montar secretos estáticos y no expone credenciales.
 
 **Estructura esperada en `values.yaml`**:
 ```yaml
 vault:
   enabled: true
   agentImage: hashicorp/vault:1.19.3
+  caCertPath: /run/secrets/kubernetes.io/serviceaccount/ca.crt
   role: storj-gateway
   secretPath: internal/data/storj-gateway/config
   template: |
     {{ with secret "internal/data/storj-gateway/config" }}
     export STORJ_ACCESS={{ .Data.data.access }}
-    export STORJ_KEY={{ index .Data.data "access-key" }}
-    export STORJ_SECRET={{ index .Data.data "secret-key" }}
+    export STORJ_MINIO_ACCESS_KEY={{ index .Data.data "access-key" }}
+    export STORJ_MINIO_SECRET_KEY={{ index .Data.data "secret-key" }}
     {{ end }}
 
 args:
   - >
-    source /vault/secrets/storj-config.txt && exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_KEY" --minio.secret-key "$STORJ_SECRET"
+    source /vault/secrets/storj-config.txt && exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_MINIO_ACCESS_KEY" --minio.secret-key "$STORJ_MINIO_SECRET_KEY"
 ```
 
 **Anotaciones en `podAnnotations` generadas automáticamente**:
 - `vault.hashicorp.com/agent-inject`
 - `vault.hashicorp.com/agent-inject-template-*`
 - `vault.hashicorp.com/agent-image`
+- `vault.hashicorp.com/ca-cert`
 - `vault.hashicorp.com/role`
 
 ---
@@ -110,7 +112,7 @@ args:
 ## 🔹 Modo 4: `envFrom` + `Secret`
 
 **Descripción**:
-- Las variables sensibles (`STORJ_ACCESS`, `STORJ_KEY`, `STORJ_SECRET`) se definen como claves de un `Secret` tipo `Opaque`.
+- Las variables sensibles (`STORJ_ACCESS`, `STORJ_MINIO_ACCESS_KEY`, `STORJ_MINIO_SECRET_KEY`) se definen como claves de un `Secret` tipo `Opaque`.
 - Se inyectan automáticamente al contenedor usando `envFrom.secretRef`.
 - Este modo es ideal cuando los secretos son gestionados por GitOps, SealedSecrets, o herramientas externas.
 
@@ -121,15 +123,15 @@ envSecret:
   name: storj-env-secret
   data:
     STORJ_ACCESS: ACCESS_VALUE
-    STORJ_KEY: ACCESS_KEY
-    STORJ_SECRET: SECRET_KEY
+    STORJ_MINIO_ACCESS_KEY: ACCESS_KEY
+    STORJ_MINIO_SECRET_KEY: SECRET_KEY
 
 args:
-  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_KEY" --minio.secret-key "$STORJ_SECRET"
+  - exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_MINIO_ACCESS_KEY" --minio.secret-key "$STORJ_MINIO_SECRET_KEY"
 ```
 
 **Ventajas**:
-- Mayor seguridad frente a ConfigMap.
+- Mayor seguridad frente a configMap.
 - Compatible con Vault Agent si prepopula el `Secret` vía controller externo.
 - Declarativo y compatible con Argo CD.
 
@@ -141,7 +143,7 @@ Este modo opcional permite desplegar el frontend **Filestash** como panel web pa
 Ideal para usuarios que requieren una interfaz gráfica de administración de ficheros.
 
 #### 📁 Secret necesario
-Filestash gestiona sus credenciales internamente, por lo que **no requiere un Secret adicional** para autenticación básica.
+**Filestash** gestiona sus credenciales internamente, por lo que **no requiere un Secret adicional** para autenticación básica.
 
 La autenticación de acceso y administración se gestiona en el propio panel web de Filestash (login + zona de admin).
 No es necesario usar anotaciones `nginx.ingress.kubernetes.io/auth-type: basic`.
@@ -151,10 +153,13 @@ No es necesario usar anotaciones `nginx.ingress.kubernetes.io/auth-type: basic`.
 ```yaml
 webUi:
   enabled: true
+  replicaCount: 1
 
   image:
     repository: machines/filestash
-    tag: "latest"   # Recomendado fijar un digest o versión estable
+    tag: "latest@sha256:8e39ba84953b547aed4a35ff65f0ab2e1a265c7e4412f7140410976c4ac5bcda"
+    digest: "sha256:8e39ba84953b547aed4a35ff65f0ab2e1a265c7e4412f7140410976c4ac5bcda"
+    # tag: "latest"   # Recomendado fijar un digest o versión estable
 
   ingress:
     enabled: true
@@ -175,11 +180,11 @@ webUi:
 ```
 
 #### 🔐 Seguridad
-- Acceso web protegido mediante **login nativo** de Filestash.
+- Acceso web protegido mediante **login nativo** de **Filestash**.
 - Zona de administración habilitada desde el propio UI (`/admin`), requiere usuario registrado con permisos.
 
 #### 📸 Capturas de pantalla (miniaturas)
-Interfaz principal de Filestash y panel de administración:
+Interfaz principal de **Filestash** y panel de administración:
 
 | UI Principal | Panel Admin |
 |--------------|-------------|
@@ -197,23 +202,23 @@ Una vez desplegado, el panel será accesible en:
 Para cada modo, se ha validado:
 
 - Correcta interpolación de `args`
-- Generación esperada de `ConfigMap` o anotaciones
+- Generación esperada de `configMap` o anotaciones
 - Inyección de secretos (modo Vault) conforme a la especificación de HashiCorp Vault Agent
 - Separación estricta de lógica en `values.yaml`, sin mezclas
 
 Comando de validación por modo:
 
 ```bash
-helm template . -f values-envFrom-configMap.yaml
-helm template . -f values-initContainer-configMap.yaml
-helm template . -f values-vault.yaml
-helm template . -f values-envFrom-Secret.yaml
+helm template mhorcajada/storj-gateway --version 0.2.3 -f values-vault.yaml
+helm template mhorcajada/storj-gateway --version 0.2.3 -f values-envFrom-Secret.yaml
+helm template mhorcajada/storj-gateway --version 0.2.3 -f values-envFrom-configMap.yaml
+helm template mhorcajada/storj-gateway --version 0.2.3 -f values-initContainer-configMap.yaml
 ```
 
 Para comprobar sintaxis e inyección de variables:
 
 ```bash
-helm install storj-release . -f values-<modo>.yaml --dry-run
+helm install storj-release mhorcajada/storj-gateway --version 0.2.3 -f values-<modo>.yaml --dry-run --debug
 ```
 
 ---
@@ -229,7 +234,7 @@ helm install storj-release . -f values-<modo>.yaml --dry-run
 
 ### 📦 Volumen persistente (PVC)
 
-El `gateway` de Storj necesita un volumen persistente en la ruta exacta `/root/.local/share/storj/gateway`.
+El `gateway` de Storj usa un volumen persistente en la ruta exacta `/root/.local/share/storj/gateway` para configuración y certificados CA.
 
 El comportamiento del PVC depende de los valores siguientes en `values.yaml`:
 
@@ -240,9 +245,9 @@ persistence:
   create: true|false     # true: el PVC será creado por Helm. false: debe existir previamente.
 ```
 
-- Para los modos `initContainer` y `vault`, es obligatorio que el volumen exista y sea **escribible**.
+- Para el modos `initContainer`, es obligatorio que el volumen exista y sea **escribible**.
 - Para el modo `envFrom`, se requiere principalmente el volumen para los archivos temporales que pueda generar `storj`, aunque no necesariamente necesita `config.yaml`.
-- En todos los casos, el `mountPath` debe ser `/root/.local/share/storj/gateway`.
+- En todos los casos, el `mountPath` debe ser `/root/.local/share/storj/gateway` por defecto o puede cambiarse con `--config-dir string`.
 - Se ha probado la combinación de `enabled: true` con `create: false` (PVC preexistente) y `create: true` (PVC gestionado por el chart).
 
 Ejemplo para PVC gestionado por Helm:
@@ -252,7 +257,7 @@ persistence:
   enabled: true
   create: true
   accessMode: ReadWriteOnce
-  size: 1Gi
+  size: 10Mi
   storageClassName: "longhorn"
   mountPath: /root/.local/share/storj/gateway
 ```
@@ -266,15 +271,14 @@ Storj genera los siguientes ficheros:
 ```bash
 /root/.local/share/storj/gateway/
 ├── config.yaml
-├── minio/
-└── lost+found/
+└── minio/
 ```
 
 Uso confirmado: 5.4 MiB aprox (`df -h`), por tanto el tamaño mínimo del PVC es:
 
 ```yaml
 persistence:
-  size: 5Mi
+  size: 10Mi
 ```
 
 ---
@@ -284,5 +288,3 @@ persistence:
 - El chart ha sido validado por fases, un modo por despliegue.
 - Los `args:` se adaptan dinámicamente al tipo de configuración seleccionada.
 - El diseño evita renderizados inválidos (e.g. conflicto entre Vault y `envFrom`).
-
-

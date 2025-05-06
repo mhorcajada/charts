@@ -28,8 +28,8 @@ vault:
   template: |
     {{ with secret "internal/data/storj-gateway/config" }}
     export STORJ_ACCESS={{ .Data.data.access }}
-    export STORJ_KEY={{ index .Data.data "access-key" }}
-    export STORJ_SECRET={{ index .Data.data "secret-key" }}
+    export STORJ_MINIO_ACCESS_KEY={{ index .Data.data "access-key" }}
+    export STORJ_MINIO_SECRET_KEY={{ index .Data.data "secret-key" }}
     {{ end }}
 
 env:
@@ -44,11 +44,11 @@ args:
   - >
     source /vault/secrets/storj-config.txt && exec /entrypoint run \
     --access "$STORJ_ACCESS" \
-    --minio.access-key "$STORJ_KEY" \
-    --minio.secret-key "$STORJ_SECRET"
+    --minio.access-key "$STORJ_MINIO_ACCESS_KEY" \
+    --minio.secret-key "$STORJ_MINIO_SECRET_KEY"
 
 # args:
-#  - source /vault/secrets/storj-config.txt && exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_KEY" --minio.secret-key "$STORJ_SECRET"    
+#  - source /vault/secrets/storj-config.txt && exec /entrypoint run --access "$STORJ_ACCESS" --minio.access-key "$STORJ_MINIO_ACCESS_KEY" --minio.secret-key "$STORJ_MINIO_SECRET_KEY"    
 
 # resources: {}
 resources:
@@ -137,8 +137,8 @@ podAnnotations:
   vault.hashicorp.com/agent-inject-template-storj-config.txt: |
     {{ with secret "internal/data/storj-gateway/config" }}
     export STORJ_ACCESS={{ .Data.data.access }}
-    export STORJ_KEY={{ index .Data.data "access-key" }}
-    export STORJ_SECRET={{ index .Data.data "secret-key" }}
+    export STORJ_MINIO_ACCESS_KEY={{ index .Data.data "access-key" }}
+    export STORJ_MINIO_SECRET_KEY={{ index .Data.data "secret-key" }}
     {{ end }}
   vault.hashicorp.com/ca-cert: /run/secrets/kubernetes.io/serviceaccount/ca.crt
   vault.hashicorp.com/role: storj-gateway

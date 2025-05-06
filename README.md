@@ -1,6 +1,6 @@
 # 📦 Helm Charts Repository - mhorcajada
 
-Este repositorio alberga charts Helm listos para su despliegue en Kubernetes. El primer chart publicado es [`storj-gateway`](./storj-gateway), diseñado para desplegar el Gateway oficial de Storj con soporte flexible para configuración vía `env`, `ConfigMap`, `initContainers` y HashiCorp Vault.
+Este repositorio alberga charts de Helm listos para su despliegue en Kubernetes. El primer chart publicado es [`storj-gateway`](./storj-gateway), diseñado para desplegar el Gateway oficial de Storj compatible S3, con soporte flexible para configuración vía `env`, `configMap`, `Secret`, `initContainers` y HashiCorp Vault con WebUI para la gestión de ficheros en los Buckets.
 
 ---
 
@@ -29,7 +29,7 @@ https://mhorcajada.github.io/charts
 
 | Chart           | Versión | App Version | Descripción                               |
 |----------------|---------|-------------|-------------------------------------------|
-| storj-gateway  | 0.2.0   | 1.10.0      | Despliegue flexible del Gateway oficial de Storj con webUI |
+| storj-gateway  | 0.2.3   | 1.10.0      | Despliegue flexible del Gateway oficial de Storj con webUI |
 
 ---
 
@@ -47,10 +47,13 @@ helm repo add mhorcajada https://mhorcajada.github.io/charts
 helm repo update
 ```
 
-### 3️⃣ Buscar charts disponibles
+### 3️⃣ Buscar charts disponibles y ver versiones de un Chart
 
 ```bash
 helm search repo mhorcajada
+```
+```bash
+helm search repo mhorcajada/storj-gateway --versions
 ```
 
 ---
@@ -70,6 +73,7 @@ helm install mi-release mhorcajada/storj-gateway -f values.yaml
 ```
 
 > Se incluyen varios archivos `values-*.yaml` en el directorio `storj-gateway/` para distintos escenarios:  
+> - `values-envFrom-Secret.yaml`  
 > - `values-envFrom-configMap.yaml`  
 > - `values-initContainer-configMap.yaml`  
 > - `values-vault.yaml`
@@ -104,4 +108,3 @@ Este repositorio utiliza GitHub Pages como backend para servir `index.yaml` y lo
 
 Miguel Horcajada  
 [mhorcajada.github.io](https://mhorcajada.github.io/charts)
-

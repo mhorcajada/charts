@@ -57,7 +57,7 @@ args:
 **Descripción**:
 - Las variables sensibles (`STORJ_ACCESS`, `STORJ_MINIO_ACCESS_KEY`, `STORJ_MINIO_SECRET_KEY`) se definen como claves de un `configMap`.
 - Se usan con `envFrom` para inyectarlas en el contenedor.
-- El binario de `storj` $\color{Green}{\textbf{gateway}}$ recibe explícitamente los parámetros como argumentos CLI.
+- El binario de `storj` $\color{Green}{\textbf{**ateway**}}$ recibe explícitamente los parámetros como argumentos CLI.
 
 **Estructura esperada en `values.yaml`**:
 ```yaml

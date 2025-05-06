@@ -74,6 +74,7 @@ persistence:
 # WebUI
 webUi:
   enabled: true
+  replicaCount: 1
 
   image:
     repository: machines/filestash

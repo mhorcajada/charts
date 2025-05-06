@@ -151,6 +151,7 @@ No es necesario usar anotaciones `nginx.ingress.kubernetes.io/auth-type: basic`.
 ```yaml
 webUi:
   enabled: true
+  replicaCount: 1
 
   image:
     repository: machines/filestash

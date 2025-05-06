@@ -7,7 +7,7 @@ metadata:
     app: {{ include "storj-gateway.name" . }}-webui
     app.kubernetes.io/managed-by: Helm
 spec:
-  replicas: 1
+  replicas: {{ .Values.webUi.replicaCount | default 1 }}
   selector:
     matchLabels:
       app: {{ include "storj-gateway.name" . }}-webui

@@ -1,6 +1,6 @@
 # 📦 Helm Charts Repository - mhorcajada
 
-Este repositorio alberga charts Helm listos para su despliegue en Kubernetes. El primer chart publicado es [`storj-gateway`](./storj-gateway), diseñado para desplegar el Gateway oficial de Storj compatible S3, con soporte flexible para configuración vía `env`, `ConfigMap`, `Secret`, `initContainers` y HashiCorp Vault con WebUI para la gestión de los Buckets.
+Este repositorio alberga charts de Helm listos para su despliegue en Kubernetes. El primer chart publicado es [`storj-gateway`](./storj-gateway), diseñado para desplegar el Gateway oficial de Storj compatible S3, con soporte flexible para configuración vía `env`, `configMap`, `Secret`, `initContainers` y HashiCorp Vault con WebUI para la gestión de ficheros en los Buckets.
 
 ---
 
@@ -29,7 +29,7 @@ https://mhorcajada.github.io/charts
 
 | Chart           | Versión | App Version | Descripción                               |
 |----------------|---------|-------------|-------------------------------------------|
-| storj-gateway  | 0.2.2   | 1.10.0      | Despliegue flexible del Gateway oficial de Storj con webUI |
+| storj-gateway  | 0.2.3   | 1.10.0      | Despliegue flexible del Gateway oficial de Storj con webUI |
 
 ---
 

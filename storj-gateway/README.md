@@ -1,4 +1,6 @@
-# Storj Gateway Helm Chart con WebUI - Documentación técnica (06-05-2025)
+# Storj Gateway Helm Chart con WebUI
+
+[![Helm Chart Version](https://img.shields.io/badge/helm--chart-v0.2.3-blue?logo=helm)](https://github.com/mhorcajada/charts/tree/gh-pages)
 
 Este repositorio contiene un Helm Chart personalizado para desplegar un contenedor **Storj Gateway** configurado dinámicamente mediante varios modos posibles de aprovisionamiento de configuración:
 
@@ -55,7 +57,7 @@ args:
 **Descripción**:
 - Las variables sensibles (`STORJ_ACCESS`, `STORJ_MINIO_ACCESS_KEY`, `STORJ_MINIO_SECRET_KEY`) se definen como claves de un `configMap`.
 - Se usan con `envFrom` para inyectarlas en el contenedor.
-- El binario `storj` recibe explícitamente los parámetros como argumentos CLI.
+- El binario de `storj` <span style="color:green">gateway</span> recibe explícitamente los parámetros como argumentos CLI.
 
 **Estructura esperada en `values.yaml`**:
 ```yaml
@@ -77,7 +79,7 @@ args:
 
 **Descripción**:
 - Se usa `Hashicorp Vault` como backend de secretos. El `Vault Agent Injector` inyecta dinámicamente un secreto como fichero plano.
-- Se utiliza `source` para cargar las variables antes de ejecutar `storj`.
+- Se utiliza `source` para cargar las variables antes de ejecutar `storj` <span style="color:green">gateway</span>.
 - Evita usar `envFrom`, montar secretos estáticos y no expone credenciales.
 
 **Estructura esperada en `values.yaml`**:

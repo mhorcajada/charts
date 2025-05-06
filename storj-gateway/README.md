@@ -1,6 +1,6 @@
 # Storj Gateway Helm Chart con WebUI - Documentación técnica (05-05-2025)
 
-Este repositorio contiene un Helm Chart personalizado para desplegar un contenedor **Storj Gateway** configurado dinámicamente mediante tres modos posibles de aprovisionamiento de configuración:
+Este repositorio contiene un Helm Chart personalizado para desplegar un contenedor **Storj Gateway** configurado dinámicamente mediante varios modos posibles de aprovisionamiento de configuración:
 
 - `Modo 1`: Configuración mediante ConfigMap + initContainer
 - `Modo 2`: Configuración mediante `envFrom` con ConfigMap
@@ -154,7 +154,8 @@ webUi:
 
   image:
     repository: machines/filestash
-    tag: "latest"   # Recomendado fijar un digest o versión estable
+    digest: "sha256:7fd7a33a0a0e8c724b5180d4d1732dd41d0525ead8d4509e37f93d83b33eaf52"
+    # tag: "latest"   # Recomendado fijar un digest o versión estable
 
   ingress:
     enabled: true
@@ -204,16 +205,16 @@ Para cada modo, se ha validado:
 Comando de validación por modo:
 
 ```bash
-helm template . -f values-envFrom-configMap.yaml
-helm template . -f values-initContainer-configMap.yaml
-helm template . -f values-vault.yaml
-helm template . -f values-envFrom-Secret.yaml
+helm template mhorcajada/storj-gateway --version 0.2.2 -f values-vault.yaml
+helm template mhorcajada/storj-gateway --version 0.2.2 -f values-envFrom-Secret.yaml
+helm template mhorcajada/storj-gateway --version 0.2.2 -f values-envFrom-configMap.yaml
+helm template mhorcajada/storj-gateway --version 0.2.2 -f values-initContainer-configMap.yaml
 ```
 
 Para comprobar sintaxis e inyección de variables:
 
 ```bash
-helm install storj-release . -f values-<modo>.yaml --dry-run
+helm install storj-release mhorcajada/storj-gateway --version 0.2.2 -f values-<modo>.yaml --dry-run --debug
 ```
 
 ---
@@ -229,7 +230,7 @@ helm install storj-release . -f values-<modo>.yaml --dry-run
 
 ### 📦 Volumen persistente (PVC)
 
-El `gateway` de Storj necesita un volumen persistente en la ruta exacta `/root/.local/share/storj/gateway`.
+El `gateway` de Storj usa un volumen persistente en la ruta exacta `/root/.local/share/storj/gateway` para configuración y certificados CA.
 
 El comportamiento del PVC depende de los valores siguientes en `values.yaml`:
 
@@ -252,7 +253,7 @@ persistence:
   enabled: true
   create: true
   accessMode: ReadWriteOnce
-  size: 1Gi
+  size: 10Mi
   storageClassName: "longhorn"
   mountPath: /root/.local/share/storj/gateway
 ```
@@ -274,7 +275,7 @@ Uso confirmado: 5.4 MiB aprox (`df -h`), por tanto el tamaño mínimo del PVC es
 
 ```yaml
 persistence:
-  size: 5Mi
+  size: 10Mi
 ```
 
 ---
@@ -284,5 +285,3 @@ persistence:
 - El chart ha sido validado por fases, un modo por despliegue.
 - Los `args:` se adaptan dinámicamente al tipo de configuración seleccionada.
 - El diseño evita renderizados inválidos (e.g. conflicto entre Vault y `envFrom`).
-
-

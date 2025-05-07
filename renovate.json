@@ -39,6 +39,23 @@
       "datasourceTemplate": "docker",
       "packageNameTemplate": "storjlabs/gateway",
       "versioningTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^storj-gateway/values\\.yaml$",
+        "^storj-gateway/values-2-cm\\.yaml$",
+        "^storj-gateway/values-default\\.yaml$",
+        "^storj-gateway/values-envFrom-Secret\\.yaml$",
+        "^storj-gateway/values-envFrom-configMap\\.yaml$",
+        "^storj-gateway/values-initContainer-configMap\\.yaml$",
+        "^storj-gateway/values-vault\\.yaml$"
+      ],
+      "matchStrings": [
+        "repository:\\s*\"?(?<depName>[\\w./-]+)\"?\\s*\\n\\s*tag:\\s*\"?(?<currentValue>latest@sha256:[a-f0-9]{64})\"?"
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
     }
   ],
   "packageRules": [
@@ -63,6 +80,24 @@
       "dependencyDashboardApproval": false,
       "automerge": true,
       "automergeType": "pr"
+    },
+    {
+      "matchManagers": ["custom.regex"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": [
+        "storj-gateway/values.yaml",
+        "storj-gateway/values-2-cm.yaml",
+        "storj-gateway/values-default.yaml",
+        "storj-gateway/values-envFrom-Secret.yaml",
+        "storj-gateway/values-envFrom-configMap.yaml",
+        "storj-gateway/values-initContainer-configMap.yaml",
+        "storj-gateway/values-vault.yaml"
+      ],
+      "groupName": "other docker digests",
+      "dependencyDashboardApproval": false,
+      "automerge": true,
+      "automergeType": "pr",
+      "pinDigests": true
     }
   ]
 }

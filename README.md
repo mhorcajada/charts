@@ -10,7 +10,7 @@ Este repositorio alberga charts de Helm listos para su despliegue en Kubernetes.
 - [Chart disponible](#-chart-disponible)
 - [Comandos Helm](#-comandos-helm)
 - [Ejemplos de instalación](#-ejemplos-de-instalación)
-- [Desinstalación](#-desinstalacion)
+- [Desinstalación](#-desinstalación)
 - [Contribuir](#-contribuir)
 
 ---

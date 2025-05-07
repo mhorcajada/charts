@@ -29,7 +29,7 @@ https://mhorcajada.github.io/charts
 
 | Chart           | Versión | App Version | Descripción                               |
 |----------------|---------|-------------|-------------------------------------------|
-| storj-gateway  | [![Helm Chart Version](https://img.shields.io/badge/helm--chart-v0.2.2-blue?logo=helm)](https://github.com/mhorcajada/charts/tree/gh-pages)  | 1.10.0      | Despliegue flexible del Gateway oficial de Storj con webUI |
+| storj-gateway  | [![Helm Chart](https://img.shields.io/badge/dynamic/yaml.svg?label=helm--chart&color=blue&logo=helm&query=$.version&url=https://raw.githubusercontent.com/mhorcajada/charts/main/storj-gateway/Chart.yaml)](https://github.com/mhorcajada/charts)   | 1.10.0      | Despliegue flexible del Gateway oficial de Storj con webUI |
 
 ---
 

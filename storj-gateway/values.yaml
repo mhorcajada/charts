@@ -18,9 +18,12 @@ schedulerName: default-scheduler
 
 # Imagen oficial del gateway de Storj
 image:
-  repository: docker.io/storjlabs/gateway  # Repositorio oficial de la imagen
-  tag: 1d044e7-v1.10.0-go1.23.4             # Versión específica y determinista
-  pullPolicy: Always                        # Política de descarga: Always, IfNotPresent o Never
+  repository: docker.io/storjlabs/gateway
+  tag: 1d044e7-v1.10.0-go1.23.4
+  pullPolicy: Always
+  # Repositorio oficial de la imagen
+  # tag versión específica y determinista
+  # Política de descarga: Always, IfNotPresent o Never
 
 # === MODO 1: Configuración por variables de entorno ===
 # Utiliza un ConfigMap para definir STORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY

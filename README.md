@@ -27,9 +27,9 @@ https://mhorcajada.github.io/charts
 
 ## 🚀 Chart disponible
 
-| Chart           | Versión | App Version | Descripción                               |
-|----------------|---------|-------------|-------------------------------------------|
-| storj-gateway  | [![Helm Chart Version](https://img.shields.io/badge/dynamic/yaml.svg?label=helm--chart&color=blue&logo=helm&query=$.version&url=https://raw.githubusercontent.com/mhorcajada/charts/main/storj-gateway/Chart.yaml)](https://github.com/mhorcajada/charts)  | 1.10.0      | Despliegue flexible del Gateway oficial de Storj con webUI |
+| Chart              | Versión | App Version | Descripción                               |
+|--------------------|---------|-------------|-------------------------------------------|
+| storj-gateway      | [![Chart](https://img.shields.io/badge/dynamic/yaml.svg?label=Chart&color=blue&logo=helm&query=$.version&url=https://raw.githubusercontent.com/mhorcajada/charts/main/storj-gateway/Chart.yaml)](https://github.com/mhorcajada/charts)   | [![App](https://img.shields.io/badge/dynamic/yaml?label=app&query=$.appVersion&url=https://raw.githubusercontent.com/mhorcajada/charts/main/storj-gateway/Chart.yaml&logo=storj&color=blue&style=flat)](https://github.com/mhorcajada/charts)      | Despliegue del Gateway S3 de Storj con webUI |
 
 ---
 

@@ -1,0 +1,55 @@
+# Copyright (C) 2025 Miguel Horcajada
+# SPDX-License-Identifier: AGPL-3.0-only
+#
+# This file is part of the "storj-gateway" Helm chart.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, version 3 only.
+#
+# Additional conditions:
+# - This software cannot be used for military, commercial, or harmful purposes.
+# - The author's name may not be used to endorse or promote derived works.
+#
+# The full license text can be found at:
+# https://www.gnu.org/licenses/agpl-3.0.txt
+
+
+[https://www.gnu.org/licenses/agpl-3.0.txt](https://www.gnu.org/licenses/agpl-3.0.txt))
+
+---
+
+SUMMARY OF INTENDED PERMISSIONS AND RESTRICTIONS
+
+The author of this software intends to clarify the scope of the AGPL-3.0 by explicitly stating the following intentions:
+
+✅ PERMITTED:
+- Use the software for any personal or commercial purpose.
+- Modify the codebase and publish modified versions.
+- Distribute the original or modified software freely.
+- Integrate this code into other software that is also AGPL-compatible.
+
+❌ NOT PERMITTED:
+- Integrate this software into **proprietary (non-open)** software without also releasing your modifications under the same AGPL license.
+- Offer this software as a **cloud/SaaS service** without releasing the modified backend code.
+- Use this software for **military, surveillance, or harmful commercial purposes**.
+
+REQUIREMENTS:
+- Must include a copyright notice and full license with any distribution.
+- Must not use the author's name or project branding to promote derived software.
+- Any public deployment must release source code under AGPL (including for SaaS).
+- Ethical usage is expected. Usage in harmful or destructive contexts is strongly discouraged.
+
+---
+
+⚠️ ETHICAL USAGE STATEMENT (Informal Addendum)
+
+The author explicitly prohibits use of this software in:
+
+- Weapon systems, military technologies or armed conflict contexts.
+- Mass surveillance, citizen repression, or privacy-invasive platforms.
+- Applications that violate human rights or environmental sustainability.
+
+Although not enforceable as license terms under AGPL-3.0, this statement reflects the author's intent and expectations regarding responsible use.
+
+---

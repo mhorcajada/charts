@@ -1,16 +1,26 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "enabledManagers": ["custom.regex"],
+  "hostRules": [
+    {
+      "hostType": "helm",
+      "matchHost": "mhorcajada.github.io",
+      "registryUrls": ["https://mhorcajada.github.io/charts"]
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["^storj-gateway/README\\.md$"],
+      "fileMatch": [
+        "^storj-gateway/README\\.md$"
+      ],
       "matchStrings": [
-        "\\[!\\[Helm Chart Version\\]\\(https://img\\.shields\\.io/badge/helm--chart-v(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+)-blue\\?logo=helm\\)\\]\\(.*\\)"
+        "\\[!\\[Helm Chart Version\\]\\(https://img\\.shields\\.io/badge/helm--chart-v(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+)-blue\\?logo=helm\\)\\]"
       ],
       "datasourceTemplate": "helm",
       "packageNameTemplate": "mhorcajada/storj-gateway",
-      "versioningTemplate": "semver"
+      "versioningTemplate": "semver",
+      "registryUrlTemplate": "https://mhorcajada.github.io/charts"
     },
     {
       "customType": "regex",
@@ -24,11 +34,11 @@
         "^storj-gateway/values-vault\\.yaml$"
       ],
       "matchStrings": [
-        "tag:\\s*\"?(?<currentValue>[a-z0-9]+-v(?<version>[0-9]+\\.[0-9]+\\.[0-9]+))\"?"
+        "tag:\\s*\"?(?<currentValue>[^\"\\s]+)\"?"
       ],
       "datasourceTemplate": "docker",
       "packageNameTemplate": "storjlabs/gateway",
-      "versioningTemplate": "semver"
+      "versioningTemplate": "docker"
     }
   ],
   "packageRules": [

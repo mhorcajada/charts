@@ -18,7 +18,7 @@
         "\\[!\\[Helm Chart Version\\]\\(https://img\\.shields\\.io/badge/helm--chart-v(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+)-blue\\?logo=helm\\)\\]"
       ],
       "datasourceTemplate": "helm",
-      "packageNameTemplate": "mhorcajada/storj-gateway",
+      "packageNameTemplate": "storj-gateway",
       "versioningTemplate": "semver",
       "registryUrlTemplate": "https://mhorcajada.github.io/charts"
     },

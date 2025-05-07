@@ -159,8 +159,7 @@ webUi:
 
   image:
     repository: machines/filestash
-    tag: "latest@sha256:8e39ba84953b547aed4a35ff65f0ab2e1a265c7e4412f7140410976c4ac5bcda"
-    digest: "sha256:8e39ba84953b547aed4a35ff65f0ab2e1a265c7e4412f7140410976c4ac5bcda"
+    tag: "latest@sha256:7fd7a33a0a0e8c724b5180d4d1732dd41d0525ead8d4509e37f93d83b33eaf52"
     # tag: "latest"   # Recomendado fijar un digest o versión estable
 
   ingress:

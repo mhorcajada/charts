@@ -1,3 +1,62 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "enabledManagers": [
+    "custom.regex"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "^storj-gateway/README\\.md$"
+      ],
+      "matchStrings": [
+        "\\[!\\[Helm Chart Version\\]\\(https://img\\.shields\\.io/badge/helm--chart-v(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+)-blue\\?logo=helm\\)\\]\\(.*\\)"
+      ],
+      "datasourceTemplate": "helm",
+      "packageNameTemplate": "mhorcajada/storj-gateway",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "^storj-gateway/values\\.yaml$",
+        "^storj-gateway/values-2-cm\\.yaml$",
+        "^storj-gateway/values-default\\.yaml$",
+        "^storj-gateway/values-envFrom-Secret\\.yaml$",
+        "^storj-gateway/values-envFrom-configMap\\.yaml$",
+        "^storj-gateway/values-initContainer-configMap\\.yaml$",
+        "^storj-gateway/values-vault\\.yaml$"
+      ],
+      "matchStrings": [
+        "tag:\\s*\"?(?<currentValue>[a-z0-9]+-v(?<version>[0-9]+\\.[0-9]+\\.[0-9]+))\"?"
+      ],
+      "datasourceTemplate": "docker",
+      "packageNameTemplate": "storjlabs/gateway",
+      "versioningTemplate": "semver"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["custom.regex"],
+      "matchDatasources": ["helm", "docker"],
+      "matchPackageNames": [
+        "mhorcajada/storj-gateway",
+        "storjlabs/gateway"
+      ],
+      "matchFileNames": [
+        "storj-gateway/README.md",
+        "storj-gateway/values.yaml",
+        "storj-gateway/values-2-cm.yaml",
+        "storj-gateway/values-default.yaml",
+        "storj-gateway/values-envFrom-Secret.yaml",
+        "storj-gateway/values-envFrom-configMap.yaml",
+        "storj-gateway/values-initContainer-configMap.yaml",
+        "storj-gateway/values-vault.yaml"
+      ],
+      "groupName": "storj-gateway updates",
+      "dependencyDashboardApproval": false,
+      "automerge": true,
+      "automergeType": "pr"
+    }
+  ]
 }

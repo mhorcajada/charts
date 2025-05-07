@@ -17,7 +17,6 @@
       "customType": "regex",
       "managerFilePatterns": [
         "/^storj-gateway/README\\.md$/",
-        "/^gh-pages/README\\.md$/",
         "/^README\\.md$/"
       ],
       "matchStrings": [
@@ -62,7 +61,6 @@
       ],
       "matchFileNames": [
         "storj-gateway/README.md",
-        "gh-pages/README.md",
         "README.md",
         "storj-gateway/values.yaml",
         "storj-gateway/values-2-cm.yaml",

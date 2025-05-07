@@ -1,6 +1,6 @@
 # Storj Gateway Helm Chart con WebUI
 
-[![Helm Chart Version](https://img.shields.io/badge/helm--chart-v0.2.2-blue?logo=helm)](https://github.com/mhorcajada/charts/tree/gh-pages)
+[![Helm Chart Version](https://img.shields.io/badge/helm--chart-v0.2.3-blue?logo=helm)](https://github.com/mhorcajada/charts/tree/gh-pages)
 
 Este repositorio contiene un Helm Chart personalizado para desplegar un contenedor **Storj Gateway** configurado dinámicamente mediante varios modos posibles de aprovisionamiento de configuración:
 

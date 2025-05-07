@@ -16,7 +16,9 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "/^storj-gateway/README\\.md$/"
+        "/^storj-gateway/README\\.md$/",
+        "/^gh-pages/README\\.md$/",
+        "/^README\\.md$/"
       ],
       "matchStrings": [
         "\\[!\\[Helm Chart Version\\]\\(https://img\\.shields\\.io/badge/helm--chart-v(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+)-blue\\?logo=helm\\)\\]"
@@ -60,6 +62,8 @@
       ],
       "matchFileNames": [
         "storj-gateway/README.md",
+        "gh-pages/README.md",
+        "README.md",
         "storj-gateway/values.yaml",
         "storj-gateway/values-2-cm.yaml",
         "storj-gateway/values-default.yaml",

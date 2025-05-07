@@ -1,18 +1,22 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "enabledManagers": ["custom.regex"],
+  "enabledManagers": [
+    "custom.regex"
+  ],
   "hostRules": [
     {
       "hostType": "helm",
       "matchHost": "mhorcajada.github.io",
-      "registryUrls": ["https://mhorcajada.github.io/charts"]
+      "registryUrls": [
+        "https://mhorcajada.github.io/charts"
+      ]
     }
   ],
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "^storj-gateway/README\\.md$"
+      "managerFilePatterns": [
+        "/^storj-gateway/README\\.md$/"
       ],
       "matchStrings": [
         "\\[!\\[Helm Chart Version\\]\\(https://img\\.shields\\.io/badge/helm--chart-v(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+)-blue\\?logo=helm\\)\\]"
@@ -24,14 +28,14 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^storj-gateway/values\\.yaml$",
-        "^storj-gateway/values-2-cm\\.yaml$",
-        "^storj-gateway/values-default\\.yaml$",
-        "^storj-gateway/values-envFrom-Secret\\.yaml$",
-        "^storj-gateway/values-envFrom-configMap\\.yaml$",
-        "^storj-gateway/values-initContainer-configMap\\.yaml$",
-        "^storj-gateway/values-vault\\.yaml$"
+      "managerFilePatterns": [
+        "/^storj-gateway/values\\.yaml$/",
+        "/^storj-gateway/values-2-cm\\.yaml$/",
+        "/^storj-gateway/values-default\\.yaml$/",
+        "/^storj-gateway/values-envFrom-Secret\\.yaml$/",
+        "/^storj-gateway/values-envFrom-configMap\\.yaml$/",
+        "/^storj-gateway/values-initContainer-configMap\\.yaml$/",
+        "/^storj-gateway/values-vault\\.yaml$/"
       ],
       "matchStrings": [
         "tag:\\s*\"?(?<currentValue>[^\"\\s]+)\"?"
@@ -43,8 +47,13 @@
   ],
   "packageRules": [
     {
-      "matchManagers": ["custom.regex"],
-      "matchDatasources": ["helm", "docker"],
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchDatasources": [
+        "helm",
+        "docker"
+      ],
       "matchPackageNames": [
         "mhorcajada/storj-gateway",
         "storjlabs/gateway"

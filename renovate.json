@@ -1,14 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "enabledManagers": [
-    "custom.regex"
-  ],
+  "enabledManagers": ["custom.regex"],
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": [
-        "^storj-gateway/README\\.md$"
-      ],
+      "fileMatch": ["^storj-gateway/README\\.md$"],
       "matchStrings": [
         "\\[!\\[Helm Chart Version\\]\\(https://img\\.shields\\.io/badge/helm--chart-v(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+)-blue\\?logo=helm\\)\\]\\(.*\\)"
       ],
@@ -18,7 +14,7 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": [
+      "fileMatch": [
         "^storj-gateway/values\\.yaml$",
         "^storj-gateway/values-2-cm\\.yaml$",
         "^storj-gateway/values-default\\.yaml$",

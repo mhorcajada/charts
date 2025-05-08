@@ -35,8 +35,10 @@ spec:
         {{- include "storj-gateway.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "storj-gateway.serviceAccountName" . | quote }}
+      {{- if .Values.podSecurityContext }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- end }}
 {{- if and (hasKey .Values "initContainer") (hasKey .Values.initContainer "enabled") (eq .Values.initContainer.enabled true) }}
       initContainers:
         - name: {{ .Values.initContainer.name }}

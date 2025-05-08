@@ -58,6 +58,15 @@ serviceAccount:
   create: true                              # Si se debe crear una cuenta dedicada
   name: storj-gateway                       # Nombre explícito para trazabilidad RBAC
 
+# securityContext define las restricciones y configuraciones de seguridad aplicadas al pod o contenedor,
+# como el UID/GID, privilegios, capacidad de escalado de privilegios, acceso al host, etc.
+securityContext: {}
+#  runAsUser: 1000
+#  runAsGroup: 1000
+#  fsGroup: 2000
+#  allowPrivilegeEscalation: false
+#  readOnlyRootFilesystem: true
+
 # Configuración del Service asociado al Deployment
 service:
   enabled: true

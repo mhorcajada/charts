@@ -39,6 +39,9 @@ envConfigMap:
 
 # ConfigMap habilitado como fuente de configuración para storj
 # Se monta en solo lectura y luego se copia sobre el PVC desde un initContainer
+#      access: REPLACE_WITH_ACCESS
+#      minio.access-key: REPLACE_WITH_ACCESS_KEY
+#      minio.secret-key: REPLACE_WITH_SECRET_KEY
 configMap:
   enabled: true
   name: storj-gateway-config
@@ -46,14 +49,157 @@ configMap:
   mountPath: /etc/storj-config
   data:
     config.yaml: |
+      # the serialized access, or name of the access to use
       access: REPLACE_WITH_ACCESS
+
+      # if used in with -h, print advanced flags help
+      # advanced: false
+
+      # additional value appended to User-Agent
+      # client.additional-user-agent: ""
+
+      # User-Agent used for connecting to the satellite
+      # client.user-agent: ""
+
+      # address to listen on for debug endpoints
+      # debug.addr: 127.0.0.1:0
+
+      # If set, a path to write a process trace SVG to
+      # debug.trace-out: ""
+
+      # if true, log function filename and line number
+      # log.caller: false
+
+      # custom level overrides for specific loggers in the format NAME1=ERROR,NAME2=WARN,... Only level increment is supported, and only for selected loggers!
+      # log.custom-level: ""
+
+      # if true, set logging to development mode
+      # log.development: false
+
+      # configures log encoding. can either be 'console', 'json', 'pretty', or 'gcloudlogging'.
+      # log.encoding: ""
+
+      # the minimum log level to log
+      # log.level: info
+
+      # can be stdout, stderr, or a filename
+      # log.output: stderr
+
+      # if true, log stack traces
+      # log.stack: false
+
+      # address(es) to send telemetry to (comma-separated)
+      # metrics.addr: collectora.storj.io:9000
+
+      # application name for telemetry identification. Ignored for certain applications.
+      # metrics.app: gateway
+
+      # application suffix. Ignored for certain applications.
+      # metrics.app-suffix: -release
+
+      # address(es) to send telemetry to (comma-separated IP:port or complex BQ definition, like bigquery:app=...,project=...,dataset=..., depends on the config/usage)
+      # metrics.event-addr: eventkitd.datasci.storj.io:9002
+
+      # size of the internal eventkit queue for UDP sending
+      # metrics.event-queue: 10000
+
+      # instance id prefix
+      # metrics.instance-prefix: ""
+
+      # how frequently to send up telemetry. Ignored for certain applications.
+      # metrics.interval: 1m0s
+
+      # Minio Access Key to use
       minio.access-key: REPLACE_WITH_ACCESS_KEY
+
+      # Minio generic server config path
+      # minio.dir: /Users/miguel/minio
+
+      # Minio Secret Key to use
       minio.secret-key: REPLACE_WITH_SECRET_KEY
 
-# Variables de entorno opcionales
+      # The default number of iterations for each check
+      # quickchecks: 100
+
+      # how many objects to delete in parallel with DeleteObjects
+      # s3.delete-objects-concurrency: 100
+
+      # return 501 (Not Implemented) for CopyObject calls
+      # s3.disable-copy-object: false
+
+      # make ListObjects(V2) fully S3-compatible (specifically: always return lexicographically ordered results) but slow
+      # s3.fully-compatible-listing: false
+
+      # include custom metadata in S3's ListObjects, ListObjectsV2 and ListMultipartUploads responses
+      # s3.include-custom-metadata-listing: true
+
+      # maximum number of items to list for gateway-side filtering using arbitrary delimiter/prefix
+      # s3.max-keys-exhaustive-limit: 100000
+
+      # MaxKeys parameter limit for S3's ListObjects and ListObjectsV2 responses
+      # s3.max-keys-limit: 1000
+
+      # MaxUploads parameter limit for S3's ListMultipartUploads responses
+      # s3.max-uploads-limit: 1000
+
+      # minimum part size for multipart uploads
+      # s3.min-part-size: 5242880
+
+      # address to serve S3 api over
+      # server.address: 127.0.0.1:7777
+
+      # address for jaeger agent
+      # tracing.agent-addr: agent.tracing.datasci.storj.io:5775
+
+      # application name for tracing identification
+      # tracing.app: gateway
+
+      # application suffix
+      # tracing.app-suffix: -release
+
+      # buffer size for collector batch packet size
+      # tracing.buffer-size: 0
+
+      # whether tracing collector is enabled
+      # tracing.enabled: true
+
+      # how frequently to flush traces to tracing agent
+      # tracing.interval: 0s
+
+      # buffer size for collector queue size
+      # tracing.queue-size: 0
+
+      # how frequent to sample traces
+      # tracing.sample: 0
+
+      # serve content as a static website
+      # website: false
+
+# Variables de entorno adicionales
 env:
   - name: STORJ_SERVER_ADDRESS
     value: 0.0.0.0:7777
+  # Activa o desactiva la interfaz web ligera incluida accesible desde http://$STORJ_SERVER_ADDRESS:7777.
+  # - name: MINIO_BROWSER
+  #   value: "on"
+  # Activa o desactiva la caché. Establece en on para habilitarla.
+  # - MINIO_CACHE: 
+  #   value: "on"
+  # Lista de patrones de objetos o buckets que se excluirán de la caché. Por ejemplo: *.pdf,mybucket/*. ￼
+  # - MINIO_CACHE_EXCLUDE: 
+  #   value: "*.pdf,mybucket/*"
+  # Porcentaje máximo del disco que se puede utilizar para la caché. Por ejemplo: 80 para permitir hasta el 80% del disco.
+  # - MINIO_CACHE_QUOTA: 
+  #   value: 80
+  # Número de accesos necesarios a un objeto antes de que se almacene en la caché. Por ejemplo: 3.
+  # - MINIO_CACHE_AFTER: 
+  #   value: 3
+  # Porcentaje del uso de la caché en el que se detendrá la limpieza de objetos. Por ejemplo: 70.
+  # - MINIO_CACHE_WATERMARK_LOW: 
+  #   value: 70
+  # Porcentaje del uso de la caché en el que se iniciará la limpieza de objetos menos utilizados. Por ejemplo: 90.
+  # - MINIO_CACHE_WATERMARK_HIGH: 
+  #   value: 90
 
 # Comando base del contenedor principal
 command:

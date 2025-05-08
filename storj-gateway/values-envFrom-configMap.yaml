@@ -51,6 +51,26 @@ envConfigMap:
     STORJ_ACCESS: REPLACE_WITH_ACCESS
     STORJ_MINIO_ACCESS_KEY: REPLACE_WITH_ACCESS_KEY
     STORJ_MINIO_SECRET_KEY: REPLACE_WITH_SECRET_KEY
+    STORJ_SERVER_ADDRESS: "0.0.0.0:7777"
+    # Activa o desactiva la interfaz web ligera incluida accesible desde http://$STORJ_SERVER_ADDRESS:7777.
+    # MINIO_BROWSER: "on"
+    # Activa o desactiva la caché. Establece en on para habilitarla.
+    # MINIO_CACHE: "on"
+    # Lista de patrones de objetos o buckets que se excluirán de la caché. Por ejemplo: *.pdf,mybucket/*.
+    # MINIO_CACHE_EXCLUDE: "*.pdf,mybucket/*"
+    # Porcentaje máximo del disco que se puede utilizar para la caché. Por ejemplo: 80 para permitir hasta el 80% del disco.
+    # MINIO_CACHE_QUOTA: "80"
+    # Número de accesos necesarios a un objeto antes de que se almacene en la caché. Por ejemplo: 3.
+    # MINIO_CACHE_AFTER: "3"
+    # Porcentaje del uso de la caché en el que se detendrá la limpieza de objetos. Por ejemplo: 70.
+    # MINIO_CACHE_WATERMARK_LOW: "70"
+    # Porcentaje del uso de la caché en el que se iniciará la limpieza de objetos menos utilizados. Por ejemplo: 90.
+    # MINIO_CACHE_WATERMARK_HIGH: "90"
+
+# Variables de entorno adicionales
+env: []
+  # - name: MYVAR
+  #   value: ""
 
 # Montaje del volumen persistente para que storj escriba
 volumeMounts:

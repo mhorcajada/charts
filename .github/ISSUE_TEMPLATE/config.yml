@@ -1,5 +1,19 @@
 blank_issues_enabled: false
+
 contact_links:
   - name: 📖 Documentation
     url: https://github.com/mhorcajada/charts/wiki
     about: Please check the documentation before opening an issue.
+
+issue_templates:
+  - name: 🐛 Bug Report
+    description: Report a reproducible bug or problem.
+    title: "[Bug]: "
+    labels: ["bug"]
+    body: bug_report.md
+
+  - name: 💡 Feature Request
+    description: Suggest a new idea or enhancement.
+    title: "[Feature]: "
+    labels: ["enhancement"]
+    body: feature_request.md

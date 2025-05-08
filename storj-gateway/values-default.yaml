@@ -63,7 +63,7 @@ serviceAccount:
   create: true
   name: storj-gateway
 
-securityContext: {}
+podSecurityContext: {}
 #  runAsUser: 1000
 #  runAsGroup: 1000
 #  fsGroup: 2000
@@ -150,4 +150,3 @@ podAnnotations:
   vault.hashicorp.com/ca-cert: /run/secrets/kubernetes.io/serviceaccount/ca.crt
   vault.hashicorp.com/role: storj-gateway
 
-podSecurityContext: {}

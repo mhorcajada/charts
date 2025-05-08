@@ -63,6 +63,13 @@ serviceAccount:
   create: true
   name: storj-gateway
 
+securityContext: {}
+#  runAsUser: 1000
+#  runAsGroup: 1000
+#  fsGroup: 2000
+#  allowPrivilegeEscalation: false
+#  readOnlyRootFilesystem: true
+
 initContainer:
   enabled: true
   name: copy-config

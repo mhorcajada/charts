@@ -79,6 +79,15 @@ serviceAccount:
   create: true
   name: storj-gateway
 
+# securityContext define las restricciones y configuraciones de seguridad aplicadas al pod o contenedor,
+# como el UID/GID, privilegios, capacidad de escalado de privilegios, acceso al host, etc.
+securityContext: {}
+#  runAsUser: 1000
+#  runAsGroup: 1000
+#  fsGroup: 2000
+#  allowPrivilegeEscalation: false
+#  readOnlyRootFilesystem: true
+
 # Configuración opcional de ConfigMap para definir variables de entorno STORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY.
 envConfigMap:
   enabled: false

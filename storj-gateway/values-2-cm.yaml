@@ -79,6 +79,8 @@ serviceAccount:
   create: true
   name: storj-gateway
 
+securityContext: {}
+
 resources:
   requests:
     cpu: "100m"

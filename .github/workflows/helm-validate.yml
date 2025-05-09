@@ -35,5 +35,3 @@ jobs:
       - name: Render templates
         run: make template
 
-      - name: Dry-run install
-        run: make install

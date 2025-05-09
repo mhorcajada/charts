@@ -1,9 +1,11 @@
 name: Make Release on Main
 
 on:
-  push:
+  pull_request:
     branches:
       - main
+    types:
+      - closed
 
 jobs:
   make-release:

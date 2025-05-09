@@ -1,0 +1,27 @@
+# Helm chart packaged archives
+*.tgz
+
+# Chart lock file
+Chart.lock
+
+# Helm cache
+.cache/
+.helm/
+helm-cache/
+helm-repository/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# Release
+release.sh
+
+# CHANGELOG.md
+CHANGELOG.md

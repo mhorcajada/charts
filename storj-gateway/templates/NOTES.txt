@@ -1,0 +1,59 @@
+
+🎉 ¡Storj Gateway desplegado con éxito!
+{{ if and .Values.envConfigMap.enabled .Values.envConfigMap.data }}
+🔐 Acceso S3:
+  Endpoint: {{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}
+  Access Key:    {{ default "REPLACE_WITH_ACCESS_KEY" .Values.envConfigMap.data.STORJ_MINIO_ACCESS_KEY }}
+  Secret Key:    {{ default "REPLACE_WITH_SECRET_KEY" .Values.envConfigMap.data.STORJ_MINIO_SECRET_KEY }}
+{{ else if and .Values.envSecret.enabled }}
+🔐 Acceso S3:
+  Endpoint: {{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}
+  Las credenciales se inyectan desde el Secret: `{{ .Values.envSecret.name }}`
+{{ else if and .Values.vault.enabled }}
+🔐 Acceso S3:
+  Endpoint: {{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}
+  Las credenciales se inyectan dinámicamente mediante Vault Agent Injector.
+{{ else }}
+🔐 Acceso S3:
+  Endpoint: {{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}
+  ⚠️ No se detectaron credenciales configuradas. Revisa `envConfigMap`, `envSecret` o Vault.
+{{ end }}
+🔧 Modos de configuración detectados:
+{{- if and .Values.configMap.enabled .Values.initContainer.enabled }}
+▶️ Modo 1: Configuración mediante configMap + initContainer.
+  - ConfigMap:     {{ .Values.configMap.name }}
+  - InitContainer: {{ .Values.initContainer.name }}
+  - Montado en:    {{ .Values.configMap.mountPath | default "/etc/storj-config" }}
+{{- else if and .Values.envConfigMap.enabled .Values.envConfigMap.name }}
+▶️ Modo 2: Configuración mediante envFrom con ConfigMap.
+  - ConfigMap:     {{ .Values.envConfigMap.name }}
+{{- else if and .Values.envSecret.enabled .Values.envSecret.name }}
+▶️ Modo 4: Configuración mediante envFrom con Secret.
+  - Secret:        {{ .Values.envSecret.name }}
+{{- else if and .Values.vault.enabled }}
+▶️ Modo 3: Configuración mediante inyección de secretos con HashiCorp Vault.
+  - Vault Annotations configuradas en los pods.
+{{- else }}
+⚠️ No se ha detectado ninguna configuración de entorno activa.
+  Revisa los valores en `envConfigMap`, `envSecret`, `vault` o `configMap`.
+{{ end }}
+{{ if .Values.webUi.enabled }}
+🌐 WebUI:
+  {{- if .Values.webUi.ingress.enabled }}
+  URL (Ingress): http{{ if .Values.webUi.ingress.tls.enabled }}s{{ end }}://{{ .Values.webUi.ingress.host }}
+  Puerto: {{ if .Values.webUi.ingress.tls.enabled }}443{{ else }}80{{ end }}
+  {{- else }}
+  Acceso interno:
+    Endpoint: {{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local
+    Puerto expuesto: {{ .Values.webUi.service.port | default 8334 }}
+  {{- end }}
+{{- end }}
+{{- if .Values.webUi.enabled }}
+  PVC (habilitado): {{ .Values.webUi.persistence.existingClaim | default "generado automáticamente" }}
+{{ end }}
+📘 Documentación:
+  → https://github.com/mhorcajada/charts/tree/main/storj-gateway
+
+⚙️ Comprobación rápida:
+  kubectl get pods -l app=storj-gateway -n {{ .Release.Namespace }}
+

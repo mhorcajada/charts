@@ -37,7 +37,7 @@ jobs:
 
       - name: Generate changelog
         run: |
-          git cliff --tag $(git describe --tags --abbrev=0) -o CHANGELOG.md
+          git cliff --tag ${{ github.ref_name }} -o CHANGELOG.md
 
       - name: Run make release
         run: make release

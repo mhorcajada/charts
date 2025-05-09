@@ -18,7 +18,7 @@
   Endpoint: {{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}
   ⚠️ No se detectaron credenciales configuradas. Revisa `envConfigMap`, `envSecret` o Vault.
 {{ end }}
-🔧 Modos de configuración detectados:
+🔧 Modo de configuración detectado:
 {{- if and .Values.configMap.enabled .Values.initContainer.enabled }}
 ▶️ Modo 1: Configuración mediante configMap + initContainer.
   - ConfigMap:     {{ .Values.configMap.name }}

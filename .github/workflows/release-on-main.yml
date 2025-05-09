@@ -1,0 +1,50 @@
+name: Make Release on Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  make-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.12.0
+
+      - name: Install Make & Git & git-cliff
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make git
+          
+      - name: Set up git-cliff
+        uses: taiki-e/install-action@v2
+        with:
+          tool: git-cliff
+
+      - name: Generate changelog
+        run: |
+          git cliff --tag $(git describe --tags --abbrev=0) -o CHANGELOG.md
+
+      - name: Run make release
+        run: make release
+
+      - name: Create GitHub Release with Changelog
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body_path: CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,6 +1,6 @@
 # Storj Gateway Helm Chart con WebUI
 
-[![Helm Chart Version](https://img.shields.io/badge/helm--chart-v0.2.4-blue?logo=helm)](https://github.com/mhorcajada/charts/tree/gh-pages)
+[![Helm Chart Version](https://img.shields.io/badge/helm--chart-v0.2.5-blue?logo=helm)](https://github.com/mhorcajada/charts/tree/gh-pages)
 
 Este repositorio contiene un Helm Chart personalizado para desplegar un contenedor **Storj Gateway** configurado dinámicamente mediante varios modos posibles de aprovisionamiento de configuración:
 
@@ -12,7 +12,7 @@ Este repositorio contiene un Helm Chart personalizado para desplegar un contened
 
 El diseño de este chart permite seleccionar **exclusivamente** un modo por despliegue, respetando la filosofía _"one responsibility per deployment"_ y asegurando aislamiento de lógica en `values.yaml`.
 
-Cada modo está validado con `helm template` y `helm install --dry-run` para garantizar su correcto renderizado sin errores y cumplimiento del comportamiento esperado.
+Cada modo está validado con `helm template` y `helm install --dry-run --debug` para garantizar su correcto renderizado sin errores y cumplimiento del comportamiento esperado.
 
 
 ## 🧩 Modos de configuración disponibles
@@ -210,16 +210,16 @@ Para cada modo, se ha validado:
 Comando de validación por modo:
 
 ```bash
-helm template mhorcajada/storj-gateway --version 0.2.4 -f values-vault.yaml
-helm template mhorcajada/storj-gateway --version 0.2.4 -f values-envFrom-Secret.yaml
-helm template mhorcajada/storj-gateway --version 0.2.4 -f values-envFrom-configMap.yaml
-helm template mhorcajada/storj-gateway --version 0.2.4 -f values-initContainer-configMap.yaml
+helm template mhorcajada/storj-gateway --version 0.2.5 -f values-vault.yaml
+helm template mhorcajada/storj-gateway --version 0.2.5 -f values-envFrom-Secret.yaml
+helm template mhorcajada/storj-gateway --version 0.2.5 -f values-envFrom-configMap.yaml
+helm template mhorcajada/storj-gateway --version 0.2.5 -f values-initContainer-configMap.yaml
 ```
 
 Para comprobar sintaxis e inyección de variables:
 
 ```bash
-helm install storj-release mhorcajada/storj-gateway --version 0.2.4 -f values-<modo>.yaml --dry-run --debug
+helm install storj-release mhorcajada/storj-gateway --version 0.2.5 -f values-<modo>.yaml --dry-run --debug
 ```
 
 ---

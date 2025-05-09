@@ -20,17 +20,11 @@ Thumbs.db
 *.swp
 *~
 
-# Makefile
-Makefile
-
 # Release
 release.sh
 
 # GitHub Pages built output (excluded from main branch, only allowed in gh-pages)
 index.yaml
-
-# untracked
-.helmignore
 
 # CHANGELOG.md
 CHANGELOG.md

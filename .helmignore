@@ -1,0 +1,12 @@
+# Archivos comunes que se deben ignorar al empaquetar el chart
+.DS_Store
+.git/
+.gitignore
+*.swp
+*.bak
+*.tmp
+*.orig
+*.log
+.env
+.vscode/
+.idea/

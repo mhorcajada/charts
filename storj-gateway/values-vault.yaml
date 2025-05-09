@@ -51,10 +51,15 @@ configMap:
   #     minio.secret-key: REPLACE_WITH_SECRET_KEY
 
 # === MODO 2: Configuración mediante envFrom con configMap ===
-# Configuración opcional de ConfigMap para definir variables de entorno S
-# TORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY.
+# Configuración opcional de ConfigMap para definir variables de entorno
+# STORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY.
 envConfigMap:
   enabled: false
+#  name: storj-env-config
+#  data:
+#    STORJ_ACCESS: "REPLACE_WITH_ACCESS"
+#    STORJ_MINIO_ACCESS_KEY: "REPLACE_WITH_ACCESS_KEY"
+#    STORJ_MINIO_SECRET_KEY: "REPLACE_WITH_SECRET_KEY"
 
 # === MODO 3: Configuración mediante inyección de secretos desde Hashicorp Vault (Vault Agent Injector) ===
 # Anotaciones específicas que activan Vault Agent Injector

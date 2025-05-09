@@ -51,8 +51,8 @@ configMap:
   #     minio.secret-key: REPLACE_WITH_SECRET_KEY
 
 # === MODO 2: Configuración mediante envFrom con configMap ===
-# Configuración opcional de ConfigMap para definir variables de entorno S
-# TORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY.
+# Configuración opcional de ConfigMap para definir variables de entorno
+# STORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY.
 envConfigMap:
   enabled: true
   name: storj-env-config

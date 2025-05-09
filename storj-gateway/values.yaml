@@ -51,8 +51,8 @@ configMap:
   #     minio.secret-key: REPLACE_WITH_SECRET_KEY
 
 # === MODO 2: Configuración mediante envFrom con configMap ===
-# Configuración opcional de ConfigMap para definir variables de entorno S
-# TORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY.
+# Configuración opcional de ConfigMap para definir variables de entorno
+# STORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY.
 envConfigMap:
   enabled: true
   name: storj-env-config
@@ -60,7 +60,7 @@ envConfigMap:
     STORJ_ACCESS: REPLACE_WITH_ACCESS       # Token de acceso generado desde la web de Storj
     STORJ_MINIO_ACCESS_KEY: REPLACE_WITH_ACCESS_KEY      # Access Key del servicio MinIO compatible
     STORJ_MINIO_SECRET_KEY: REPLACE_WITH_SECRET_KEY   # Secret Key del servicio MinIO compatible
-    STORJ_SERVER_ADDRESS: "0.0.0.0:7777"
+    # STORJ_SERVER_ADDRESS: "0.0.0.0:7777"
     # Activa o desactiva la interfaz web ligera incluida accesible desde http://$STORJ_SERVER_ADDRESS:7777.
     # MINIO_BROWSER: "on"
     # Activa o desactiva la caché. Establece en on para habilitarla.

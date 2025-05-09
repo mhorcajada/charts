@@ -1,4 +1,4 @@
-name: Release
+name: GitHub Release
 
 on:
   push:
@@ -6,10 +6,11 @@ on:
       - "v*"
 
 jobs:
-  generate-changelog:
+  generate-release:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up git-cliff
@@ -25,7 +26,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add -f CHANGELOG.md
-          git commit -m "docs: update changelog for ${{ github.ref_name }}"
+          git commit -m "docs: update changelog for ${{ github.ref_name }}" || echo "No changes to commit"
           git push
 
       - name: Create GitHub Release

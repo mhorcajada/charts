@@ -1,12 +1,14 @@
 name: Publish Helm Chart to GitHub Pages
 
 on:
-  push:
-    tags:
-      - 'v*'  # Ejecutar solo cuando se cree un nuevo tag, como v0.2.0
+  workflow_run:
+    workflows: ["GitHub Release"]
+    types:
+      - completed
 
 jobs:
-  release:
+  publish-chart:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -19,21 +21,21 @@ jobs:
           version: v3.12.0
 
       - name: Extract chart version from tag
-        id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
       - name: Package Helm chart
         run: |
-          helm package storj-gateway --version $VERSION --destination .
+          mkdir -p helm-artifacts
+          helm package storj-gateway --version "$VERSION" --destination helm-artifacts
 
-      - name: Update Helm index
+      - name: Update Helm repo index
         run: |
+          cd helm-artifacts
           helm repo index . --url https://mhorcajada.github.io/charts
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
+          publish_dir: ./helm-artifacts
           publish_branch: gh-pages
-          force_orphan: true

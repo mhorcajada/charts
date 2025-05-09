@@ -1,0 +1,37 @@
+# Helm chart packaged archives
+*.tgz
+
+# Chart lock file
+Chart.lock
+
+# Helm cache
+.cache/
+.helm/
+helm-cache/
+helm-repository/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# Makefile
+Makefile
+
+# Release
+release.sh
+
+# GitHub Pages built output (excluded from main branch, only allowed in gh-pages)
+index.yaml
+
+# untracked
+.helmignore
+
+# CHANGELOG.md
+CHANGELOG.md
+

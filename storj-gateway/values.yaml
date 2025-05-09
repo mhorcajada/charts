@@ -16,6 +16,17 @@ dnsPolicy: ClusterFirst
 # Planificador usado para la asignación del pod al nodo
 schedulerName: default-scheduler
 
+# Estrategia de actualización rolling (actualización progresiva de pods)
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 25%         # Máximo de pods adicionales sobre el número deseado
+    maxUnavailable: 25%   # Máximo de pods no disponibles durante la actualización
+
+# Sobrescriben los nombres automáticos generados por Helm
+nameOverride: "storj"
+fullnameOverride: "storj-test"
+
 # Imagen oficial del gateway de Storj
 image:
   repository: docker.io/storjlabs/gateway
@@ -25,8 +36,23 @@ image:
   # tag versión específica y determinista
   # Política de descarga: Always, IfNotPresent o Never
 
-# === MODO 1: Configuración por variables de entorno ===
-# Utiliza un ConfigMap para definir STORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY
+# === MODO 1: Configuración mediante configMap + initContainer ===
+# ConfigMap habilitado como fuente de configuración para storj
+# Se monta en solo lectura y luego se copia sobre el PVC desde un initContainer
+configMap:
+  enabled: false
+  # name: storj-gateway-config
+  # defaultMode: 420
+  # mountPath: /etc/storj-config
+  # data:
+  #   config.yaml: |
+  #     access: REPLACE_WITH_ACCESS
+  #     minio.access-key: REPLACE_WITH_ACCESS_KEY
+  #     minio.secret-key: REPLACE_WITH_SECRET_KEY
+
+# === MODO 2: Configuración mediante envFrom con configMap ===
+# Configuración opcional de ConfigMap para definir variables de entorno S
+# TORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY.
 envConfigMap:
   enabled: true
   name: storj-env-config
@@ -50,10 +76,24 @@ envConfigMap:
     # Porcentaje del uso de la caché en el que se iniciará la limpieza de objetos menos utilizados. Por ejemplo: 90.
     # MINIO_CACHE_WATERMARK_HIGH: "90"
 
+# === MODO 3: Configuración mediante inyección de secretos desde Hashicorp Vault (Vault Agent Injector) ===
+# https://raw.githubusercontent.com/mhorcajada/charts/refs/heads/main/storj-gateway/values-vault.yaml
+
+# === MODO 4: configuración por variables de entorno con Secret ===
+# Opcional: definir un Secret con las credenciales STORJ si no se usa Vault.
+# Se montará como envFrom o como variables individuales si está activado.
+envSecret:
+  enabled: false
+  # name: storj-env-secret
+  # data:
+  #   STORJ_ACCESS: "REPLACE_WITH_ACCESS"
+  #   STORJ_MINIO_ACCESS_KEY: "REPLACE_WITH_ACCESS_KEY"
+  #   STORJ_MINIO_SECRET_KEY: "REPLACE_WITH_SECRET_KEY"
+
 # Variables de entorno adicionales
-env: []
-  # - name: MYVAR
-  # o  value: ""
+env:
+  - name: STORJ_SERVER_ADDRESS
+    value: 0.0.0.0:7777
 
 # Comando base de ejecución del contenedor principal
 command:
@@ -87,13 +127,6 @@ podSecurityContext: {}
 #  allowPrivilegeEscalation: false
 #  readOnlyRootFilesystem: true
 
-# Configuración del Service asociado al Deployment
-service:
-  enabled: true
-  type: ClusterIP                           # Tipo de servicio: ClusterIP, NodePort o LoadBalancer
-  port: 7777                                # Puerto externo expuesto
-  targetPort: 7777                          # Puerto del contenedor (interno)
-
 # Configuración del volumen persistente donde se guarda config.yaml y datos de gateway
 persistence:
   enabled: true                             # Requiere PVC vinculado
@@ -103,7 +136,19 @@ persistence:
   accessMode: ReadWriteOnce                 # Modo de acceso típico para un solo pod
   size: 5Mi                                 # Tamaño mínimo requerido por storj para almacenar config y caché
 
-# WebUI
+# Montaje de volumen necesario para que Storj persista su cache local
+volumeMounts:
+  - mountPath: /root/.local/share/storj/gateway
+    name: storj-config
+
+# Configuración del Service asociado al Deployment
+service:
+  enabled: true
+  type: ClusterIP                           # Tipo de servicio: ClusterIP, NodePort o LoadBalancer
+  port: 7777                                # Puerto externo expuesto
+  targetPort: 7777                          # Puerto del contenedor (interno)
+
+# === MODO WebUI: webUi.enabled: true habilita la interfaz web para gestión de ficheros en Storj ===
 webUi:
   enabled: true
   replicaCount: 1
@@ -117,14 +162,13 @@ webUi:
     className: nginx
     host: filestash.cluster.local
     tls:
-      enabled: true
-      issuer: vault-issuer
-      secretName: filestash-tls
+      enabled: true              # true para TLS, false para HTTP plano
+      issuer: vault-issuer       # Issuer de cert-manager (e.g. vault-issuer, letsencrypt-prod)
+      secretName: filestash-tls  # Nombre del Secret TLS
 
   persistence:
     enabled: true
     create: true
-    existingClaim: filestash-config-pvc
+    existingClaim: filestash-config-pvc  # Si 'create' es false, debe existir este PVC
     storageClassName: longhorn
     size: 50Mi
-

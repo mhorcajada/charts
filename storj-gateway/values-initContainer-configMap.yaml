@@ -16,27 +16,27 @@ dnsPolicy: ClusterFirst
 # Planificador usado para la asignación del pod al nodo
 schedulerName: default-scheduler
 
-# Estrategia de actualización rolling
+# Estrategia de actualización rolling (actualización progresiva de pods)
 strategy:
   type: RollingUpdate
   rollingUpdate:
-    maxSurge: 25%
-    maxUnavailable: 25%
+    maxSurge: 25%         # Máximo de pods adicionales sobre el número deseado
+    maxUnavailable: 25%   # Máximo de pods no disponibles durante la actualización
 
-# Sobrescritura de nombres para evitar prefijos automáticos del release
+# Sobrescriben los nombres automáticos generados por Helm
 nameOverride: "storj"
 fullnameOverride: "storj-test"
 
-# Imagen oficial de storjlabs gateway
+# Imagen oficial del gateway de Storj
 image:
   repository: docker.io/storjlabs/gateway
   tag: 1d044e7-v1.10.0-go1.23.4
   pullPolicy: Always
+  # Repositorio oficial de la imagen
+  # tag versión específica y determinista
+  # Política de descarga: Always, IfNotPresent o Never
 
-# Configuración opcional de ConfigMap para definir variables de entorno STORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY.
-envConfigMap:
-  enabled: false
-
+# === MODO 1: Configuración mediante configMap + initContainer ===
 # ConfigMap habilitado como fuente de configuración para storj
 # Se monta en solo lectura y luego se copia sobre el PVC desde un initContainer
 #      access: REPLACE_WITH_ACCESS
@@ -175,6 +175,26 @@ configMap:
       # serve content as a static website
       # website: false
 
+# === MODO 2: Configuración mediante envFrom con configMap ===
+# Configuración opcional de ConfigMap para definir variables de entorno S
+# TORJ_ACCESS, STORJ_MINIO_ACCESS_KEY y STORJ_MINIO_SECRET_KEY.
+envConfigMap:
+  enabled: false
+
+# === MODO 3: Configuración mediante inyección de secretos desde Hashicorp Vault (Vault Agent Injector) ===
+# https://raw.githubusercontent.com/mhorcajada/charts/refs/heads/main/storj-gateway/values-vault.yaml
+
+# === MODO 4: configuración por variables de entorno con Secret ===
+# Opcional: definir un Secret con las credenciales STORJ si no se usa Vault.
+# Se montará como envFrom o como variables individuales si está activado.
+envSecret:
+  enabled: false
+  # name: storj-env-secret
+  # data:
+  #   STORJ_ACCESS: "REPLACE_WITH_ACCESS"
+  #   STORJ_MINIO_ACCESS_KEY: "REPLACE_WITH_ACCESS_KEY"
+  #   STORJ_MINIO_SECRET_KEY: "REPLACE_WITH_SECRET_KEY"
+
 # Variables de entorno adicionales
 env:
   - name: STORJ_SERVER_ADDRESS
@@ -233,13 +253,6 @@ podSecurityContext: {}
 #  allowPrivilegeEscalation: false
 #  readOnlyRootFilesystem: true
 
-# Montajes requeridos por initContainer y contenedor principal
-volumeMounts:
-  - mountPath: /root/.local/share/storj/gateway
-    name: storj-config
-  - mountPath: /etc/storj-config
-    name: storj-configmap
-
 # Volumen persistente requerido por storj para escribir su config.yaml
 # Esta ruta coincide con el path predeterminado usado por storj
 persistence:
@@ -250,6 +263,20 @@ persistence:
   size: 5Mi
   storageClassName: ""
   create: false
+
+# Montajes requeridos por initContainer y contenedor principal
+volumeMounts:
+  - mountPath: /root/.local/share/storj/gateway
+    name: storj-config
+  - mountPath: /etc/storj-config
+    name: storj-configmap
+
+# Servicio expone el puerto 7777 como ClusterIP
+service:
+  enabled: true
+  type: ClusterIP
+  port: 7777
+  targetPort: 7777
 
 # InitContainer que copia el fichero config.yaml desde el configMap
 # al volumen persistente RW esperado por storj
@@ -279,25 +306,27 @@ initContainer:
       cpu: "50m"
       memory: "64Mi"
 
-# Servicio expone el puerto 7777 como ClusterIP
-service:
+# === MODO WebUI: webUi.enabled: true habilita la interfaz web para gestión de ficheros en Storj ===
+webUi:
   enabled: true
-  type: ClusterIP
-  port: 7777
-  targetPort: 7777
+  replicaCount: 1
 
-# Anotaciones para Vault (comentadas, no se usa en este despliegue)
-# podAnnotations: {}
-#   vault.hashicorp.com/agent-image: hashicorp/vault:1.19.3
-#   vault.hashicorp.com/agent-inject: "true"
-#   vault.hashicorp.com/agent-inject-secret-storj-config.txt: internal/data/storj-gateway/config
-#   vault.hashicorp.com/agent-inject-status: update
-#   vault.hashicorp.com/agent-inject-template-storj-config.txt: |
-#     {{ with secret "internal/data/storj-gateway/config" }}
-#     export STORJ_ACCESS={{ .Data.data.access }}
-#     export STORJ_MINIO_ACCESS_KEY={{ index .Data.data "access-key" }}
-#     export STORJ_MINIO_SECRET_KEY={{ index .Data.data "secret-key" }}
-#     {{ end }}
-#   vault.hashicorp.com/ca-cert: /run/secrets/kubernetes.io/serviceaccount/ca.crt
-#   vault.hashicorp.com/role: storj-gateway
+  image:
+    repository: machines/filestash
+    tag: "latest@sha256:7fd7a33a0a0e8c724b5180d4d1732dd41d0525ead8d4509e37f93d83b33eaf52"
 
+  ingress:
+    enabled: true
+    className: nginx
+    host: filestash.cluster.local
+    tls:
+      enabled: true              # true para TLS, false para HTTP plano
+      issuer: vault-issuer       # Issuer de cert-manager (e.g. vault-issuer, letsencrypt-prod)
+      secretName: filestash-tls  # Nombre del Secret TLS
+
+  persistence:
+    enabled: true
+    create: true
+    existingClaim: filestash-config-pvc  # Si 'create' es false, debe existir este PVC
+    storageClassName: longhorn
+    size: 50Mi

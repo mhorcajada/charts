@@ -118,4 +118,3 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       dnsPolicy: {{ .Values.dnsPolicy }}
       schedulerName: {{ .Values.schedulerName }}
-

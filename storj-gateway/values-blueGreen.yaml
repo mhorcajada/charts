@@ -16,20 +16,14 @@ dnsPolicy: ClusterFirst
 # Planificador usado para la asignación del pod al nodo
 schedulerName: default-scheduler
 
-# Estrategia de actualización rolling (actualización progresiva de pods)
-strategy:
-  type: RollingUpdate
-  rollingUpdate:
-    maxSurge: 25%         # Máximo de pods adicionales sobre el número deseado
-    maxUnavailable: 25%   # Máximo de pods no disponibles durante la actualización
-
+# Estrategia de actualización rolling blueGreen (actualización rollout de pods)
 blueGreen:
-  enabled: false
-  # autoPromotionEnabled: false
-  # scaleDownDelaySeconds: 30
-  # previewReplicaCount: 1
-  # activeService: storj-gateway-active
-  # previewService: storj-gateway-preview
+  enabled: true
+  autoPromotionEnabled: false
+  scaleDownDelaySeconds: 30
+  previewReplicaCount: 1
+  activeService: storj-gateway-active
+  previewService: storj-gateway-preview
 
 # Sobrescriben los nombres automáticos generados por Helm
 nameOverride: "storj"

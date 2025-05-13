@@ -41,7 +41,7 @@ spec:
             initialDelaySeconds: {{ .Values.webUi.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.webUi.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.webUi.readinessProbe.timeoutSeconds }}
-            failureThreshold: {{ .Values.webui.readinessProbe.failureThreshold }}
+            failureThreshold: {{ .Values.webUi.readinessProbe.failureThreshold }}
           {{- end }}
           volumeMounts:
             - name: config

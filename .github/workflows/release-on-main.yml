@@ -38,6 +38,9 @@ jobs:
         with:
           version: v3.12.0
 
+      - name: Disable man-db auto-update trigger
+        run: sudo rm -f /var/lib/man-db/auto-update
+
       - name: Install dependencies
         run: |
           sudo apt-get update

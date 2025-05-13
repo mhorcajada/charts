@@ -42,7 +42,7 @@ test: ## 🔧 Muestra el valor actual de las variables usadas en el release
 	@echo "------------------------------"
 	@echo "📦 CHART_NAME    = $(CHART_NAME)"
 	@echo "📂 CHART_DIR     = $(CHART_DIR)"
-	@echo "🏷  CHART_VERSION = $(CHART_VERSION)"
+	@echo "🏷 CHART_VERSION = $(CHART_VERSION)"
 	@echo "🌐 REPO_URL      = $(REPO_URL)"
 	@echo "📁 DIST_DIR      = $(DIST_DIR)"
 	@echo "------------------------------"
@@ -109,7 +109,7 @@ sync-index: clean-cache ## 🔄 Refresca el repo Helm local
 	helm repo update
 	helm search repo mhorcajada/$(CHART_NAME) --versions
 
-release:  precheck lint template install package save-artifacts push-main push-gh-pages create-tag sync-index ## 📦 Publica el chart completo. Uso: make release CHART_VERSION=0.x.x   y   make release
+release:  precheck lint template package save-artifacts push-main push-gh-pages create-tag sync-index ## 📦 Publica el chart completo. Uso: make release CHART_VERSION=0.x.x   y   make release
 	@echo "\n✅ Publicación completada:"
 	@echo "🔗 Chart URL: $(REPO_URL)/$(CHART_NAME)-$(CHART_VERSION).tgz"
 	@echo "📦 Añade el repo con:"

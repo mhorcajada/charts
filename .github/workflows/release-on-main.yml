@@ -9,13 +9,14 @@ on:
 
 jobs:
   make-release:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Git
+      - name: Set up Git identity
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
@@ -25,28 +26,46 @@ jobs:
         with:
           version: v3.12.0
 
-      - name: Install Make & Git & git-cliff
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y make git
-          
-      - name: Set up git-cliff
+          sudo apt-get install -y make git yq
+
+      - name: Install git-cliff
         uses: taiki-e/install-action@v2
         with:
           tool: git-cliff
 
-      - name: Generate changelog
+      - name: Detect previous tag
+        id: previous_tag
         run: |
-          git cliff --tag ${{ github.ref_name }} -o CHANGELOG.md
+          if git describe --tags --abbrev=0 >/dev/null 2>&1; then
+            echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Run make release
+      - name: Run make release (creates and pushes new tag)
         run: make release
 
-      - name: Create GitHub Release with Changelog
+      - name: Detect new tag
+        id: new_tag
+        run: |
+          echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+
+      - name: Generate changelog
+        run: |
+          if [[ -n "${{ steps.previous_tag.outputs.tag }}" ]]; then
+            git cliff --range "${{ steps.previous_tag.outputs.tag }}..${{ steps.new_tag.outputs.tag }}" -o CHANGELOG.md
+          else
+            git cliff --range "${{ steps.new_tag.outputs.tag }}" -o CHANGELOG.md
+          fi
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          tag_name: ${{ steps.new_tag.outputs.tag }}
+          name: Release ${{ steps.new_tag.outputs.tag }}
           body_path: CHANGELOG.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

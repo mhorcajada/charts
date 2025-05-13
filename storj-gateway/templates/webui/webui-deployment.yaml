@@ -23,6 +23,26 @@ spec:
           image: "{{- if .Values.webUi.image.digest -}}{{ .Values.webUi.image.repository }}@{{ .Values.webUi.image.digest }}{{- else -}}{{ .Values.webUi.image.repository }}:{{ .Values.webUi.image.tag | default "latest" }}{{- end }}"
           ports:
             - containerPort: 8334
+          {{- if .Values.webUi.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.webUi.livenessProbe.httpGet.path }}
+              port: {{ .Values.webUi.livenessProbe.httpGet.port }}
+            initialDelaySeconds: {{ .Values.webUi.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.webUi.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.webUi.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.webUi.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.webUi.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.webUi.readinessProbe.httpGet.path }}
+              port: {{ .Values.webUi.readinessProbe.httpGet.port }}
+            initialDelaySeconds: {{ .Values.webUi.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.webUi.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.webUi.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.webui.readinessProbe.failureThreshold }}
+          {{- end }}
           volumeMounts:
             - name: config
               mountPath: /app/data/state/config

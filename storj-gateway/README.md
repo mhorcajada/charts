@@ -289,4 +289,3 @@ persistence:
 - El chart ha sido validado por fases, un modo por despliegue.
 - Los `args:` se adaptan dinámicamente al tipo de configuración seleccionada.
 - El diseño evita renderizados inválidos (e.g. conflicto entre Vault y `envFrom`).
-

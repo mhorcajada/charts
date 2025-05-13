@@ -186,6 +186,28 @@ service:
   port: 7777
   targetPort: 7777
 
+# Configura la sonda de liveness para detectar si el contenedor necesita reiniciarse
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: 7777
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 5
+
+# Configura la sonda de readiness para saber cuándo el contenedor está listo para recibir tráfico
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: 7777
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 3
+
 # === MODO WebUI: webUi.enabled: true habilita la interfaz web para gestión de ficheros en Storj ===
 webUi:
   enabled: true
@@ -203,6 +225,28 @@ webUi:
       enabled: true              # true para TLS, false para HTTP plano
       issuer: vault-issuer       # Issuer de cert-manager (e.g. vault-issuer, letsencrypt-prod)
       secretName: filestash-tls  # Nombre del Secret TLS
+
+  # Configura la sonda de liveness para detectar si el contenedor necesita reiniciarse
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: 8334
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 5
+
+  # Configura la sonda de readiness para saber cuándo el contenedor está listo para recibir tráfico
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: 8334
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 2
+    failureThreshold: 3
 
   persistence:
     enabled: true

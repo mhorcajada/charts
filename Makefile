@@ -74,7 +74,6 @@ push-main: ## ⬆️  Sube el release a main si hay cambios antes de saltar a gh
 	git add storj-gateway/Chart.yaml
 	git add storj-gateway/README.md
 	(git commit -m "release($(CHART_NAME)): publish chart v$(CHART_VERSION)" && git push) || echo "ℹ️ Nada que commitear"
-	git push
 
 push-gh-pages: ## 🚀 Sube a gh-pages los artefactos necesarios
 	@echo "🚀 Subiendo $(CHART_NAME)-$(CHART_VERSION).tgz al branch gh-pages..."

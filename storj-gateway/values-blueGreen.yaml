@@ -17,13 +17,15 @@ dnsPolicy: ClusterFirst
 schedulerName: default-scheduler
 
 # Estrategia de actualización rolling blueGreen (actualización rollout de pods)
-blueGreen:
+rollout:
   enabled: true
-  autoPromotionEnabled: false
-  scaleDownDelaySeconds: 30
-  previewReplicaCount: 1
-  activeService: storj-gateway-active
-  previewService: storj-gateway-preview
+  strategy:
+    autoPromotionEnabled: false
+    autoPromotionSeconds: 0
+    scaleDownDelaySeconds: 30
+    previewReplicaCount: 1
+    activeService: ""   # storj-gateway-active, se puede dejar en blanco: Helm lo genera automáticamente
+    previewService: ""  # storj-gateway-preview,se puede dejar en blanco: Helm lo genera automáticamente
 
 # Sobrescriben los nombres automáticos generados por Helm
 nameOverride: "storj"

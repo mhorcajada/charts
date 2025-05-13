@@ -279,23 +279,23 @@ service:
 livenessProbe:
   enabled: true
   httpGet:
-    path: /
+    path: /minio/health/live
     port: 7777
   initialDelaySeconds: 15
   periodSeconds: 10
-  timeoutSeconds: 3
+  timeoutSeconds: 5
   failureThreshold: 5
 
 # Configura la sonda de readiness para saber cuándo el contenedor está listo para recibir tráfico
 readinessProbe:
   enabled: true
   httpGet:
-    path: /
+    path: /minio/health/live
     port: 7777
-  initialDelaySeconds: 5
-  periodSeconds: 5
-  timeoutSeconds: 2
-  failureThreshold: 3
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 5
 
 podAnnotations:
   vault.hashicorp.com/agent-image: hashicorp/vault:1.19.3

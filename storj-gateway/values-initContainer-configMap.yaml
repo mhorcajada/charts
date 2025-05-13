@@ -283,6 +283,28 @@ service:
   port: 7777
   targetPort: 7777
 
+# Configura la sonda de liveness para detectar si el contenedor necesita reiniciarse
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: 7777
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 5
+
+# Configura la sonda de readiness para saber cuándo el contenedor está listo para recibir tráfico
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: 7777
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 3
+
 # InitContainer que copia el fichero config.yaml desde el configMap
 # al volumen persistente RW esperado por storj
 initContainer:

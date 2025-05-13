@@ -68,9 +68,9 @@ jobs:
       - name: Generate changelog
         run: |
           if [[ -n "${{ steps.previous_tag.outputs.tag }}" ]]; then
-            git cliff --range "${{ steps.previous_tag.outputs.tag }}..${{ steps.new_tag.outputs.tag }}" -o CHANGELOG.md
+            git cliff "${{ steps.previous_tag.outputs.tag }}..${{ steps.new_tag.outputs.tag }}" -o CHANGELOG.md
           else
-            git cliff --range "${{ steps.new_tag.outputs.tag }}" -o CHANGELOG.md
+            git cliff "${{ steps.new_tag.outputs.tag }}" -o CHANGELOG.md
           fi
 
       - name: Create GitHub Release

@@ -105,6 +105,7 @@ sync-index: clean-cache ## 🔄 Refresca el repo Helm local
 	@echo "🔄 Refrescando repositorio Helm local..."
 	helm repo remove mhorcajada || true
 	helm repo add mhorcajada $(REPO_URL)
+	sleep 5
 	helm repo update
 	helm search repo mhorcajada/$(CHART_NAME) --versions
 

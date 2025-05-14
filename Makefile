@@ -58,7 +58,13 @@ template: ## 🔍 Renderiza manifest con template
 install: ## 🚀 Simula instalación (--dry-run --debug)
 	helm install $(CHART_NAME)-test ./$(CHART_DIR) -f $(CHART_DIR)/values.yaml --dry-run --debug
 
+add-repo: ## 🔗 Añade el repositorio Helm mhorcajada y actualiza el índice
+	@helm repo add mhorcajada $(REPO_URL) || true
+	@helm repo update || true
+
 update-readme-version: ## 📝 Sustituye versión en README.md si CHART_VERSION > LATEST_VERSION
+	@git config user.name "github-actions"
+	@git config user.email "github-actions@github.com"
 	@LATEST_VERSION=$$(curl -s $(REPO_URL)/index.yaml | yq '.entries["$(CHART_NAME)"][0].version' | tr -d '"'); \
 	if [ -z "$$LATEST_VERSION" ]; then \
 		echo "❌ No se pudo obtener la versión remota desde $(REPO_URL)/index.yaml"; exit 1; \
@@ -122,7 +128,7 @@ sync-index: clean-cache ## 🔄 Refresca el repo Helm local
 	sleep 5
 	helm search repo mhorcajada/$(CHART_NAME) --versions
 
-release:  precheck lint template update-readme-version package save-artifacts push-main push-gh-pages create-tag sync-index ## 📦 Publica el chart completo. Uso: make release CHART_VERSION=0.x.x   y   make release
+release:  precheck lint template add-repo update-readme-version package save-artifacts push-main push-gh-pages create-tag sync-index ## 📦 Publica el chart completo. Uso: make release CHART_VERSION=0.x.x   y   make release
 	@echo "\n✅ Publicación completada:"
 	@echo "🔗 Chart URL: $(REPO_URL)/$(CHART_NAME)-$(CHART_VERSION).tgz"
 	@echo "📦 Añade el repo con:"

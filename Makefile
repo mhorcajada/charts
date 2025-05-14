@@ -58,10 +58,6 @@ template: ## 🔍 Renderiza manifest con template
 install: ## 🚀 Simula instalación (--dry-run --debug)
 	helm install $(CHART_NAME)-test ./$(CHART_DIR) -f $(CHART_DIR)/values.yaml --dry-run --debug
 
-package: ## 📦 Empaqueta el chart
-	helm package $(CHART_DIR) --version $(CHART_VERSION) --destination .
-
-
 update-readme-version: ## 📝 Sustituye versión en README.md si CHART_VERSION > LATEST_VERSION
 	@LATEST_VERSION=$$(curl -s $(REPO_URL)/index.yaml | yq '.entries["$(CHART_NAME)"][0].version' | tr -d '"'); \
 	if [ -z "$$LATEST_VERSION" ]; then \
@@ -73,6 +69,9 @@ update-readme-version: ## 📝 Sustituye versión en README.md si CHART_VERSION 
 	else \
 		echo "✅ README.md ya contiene la última versión: $(CHART_VERSION)"; \
 	fi
+
+package: ## 📦 Empaqueta el chart
+	helm package $(CHART_DIR) --version $(CHART_VERSION) --destination .
 
 index: ## 🔃 Regenera el index.yaml
 	helm repo index . --url $(REPO_URL)

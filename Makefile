@@ -58,6 +58,18 @@ template: ## 🔍 Renderiza manifest con template
 install: ## 🚀 Simula instalación (--dry-run --debug)
 	helm install $(CHART_NAME)-test ./$(CHART_DIR) -f $(CHART_DIR)/values.yaml --dry-run --debug
 
+update-readme-version: ## 📝 Sustituye versión en README.md si CHART_VERSION > LATEST_VERSION
+	@LATEST_VERSION=$$(curl -s $(REPO_URL)/index.yaml | yq '.entries["$(CHART_NAME)"][0].version' | tr -d '"'); \
+	if [ -z "$$LATEST_VERSION" ]; then \
+		echo "❌ No se pudo obtener la versión remota desde $(REPO_URL)/index.yaml"; exit 1; \
+	fi; \
+	if dpkg --compare-versions "$(CHART_VERSION)" gt "$$LATEST_VERSION"; then \
+		echo "🔁 Actualizando README.md de $$LATEST_VERSION → $(CHART_VERSION)..."; \
+		sed -i "s/$$LATEST_VERSION/$(CHART_VERSION)/g" $(CHART_DIR)/README.md; \
+	else \
+		echo "✅ README.md ya contiene la última versión: $(CHART_VERSION)"; \
+	fi
+
 package: ## 📦 Empaqueta el chart
 	helm package $(CHART_DIR) --version $(CHART_VERSION) --destination .
 
@@ -105,10 +117,12 @@ sync-index: clean-cache ## 🔄 Refresca el repo Helm local
 	@echo "🔄 Refrescando repositorio Helm local..."
 	helm repo remove mhorcajada || true
 	helm repo add mhorcajada $(REPO_URL)
+	sleep 1
 	helm repo update
+	sleep 5
 	helm search repo mhorcajada/$(CHART_NAME) --versions
 
-release:  precheck lint template package save-artifacts push-main push-gh-pages create-tag sync-index ## 📦 Publica el chart completo. Uso: make release CHART_VERSION=0.x.x   y   make release
+release:  precheck lint template update-readme-version package save-artifacts push-main push-gh-pages create-tag sync-index ## 📦 Publica el chart completo. Uso: make release CHART_VERSION=0.x.x   y   make release
 	@echo "\n✅ Publicación completada:"
 	@echo "🔗 Chart URL: $(REPO_URL)/$(CHART_NAME)-$(CHART_VERSION).tgz"
 	@echo "📦 Añade el repo con:"

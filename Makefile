@@ -59,6 +59,8 @@ install: ## 🚀 Simula instalación (--dry-run --debug)
 	helm install $(CHART_NAME)-test ./$(CHART_DIR) -f $(CHART_DIR)/values.yaml --dry-run --debug
 
 update-readme-version: ## 📝 Sustituye versión en README.md si CHART_VERSION > LATEST_VERSION
+	@git config user.name "github-actions"
+	@git config user.email "github-actions@github.com"
 	@LATEST_VERSION=$$(curl -s $(REPO_URL)/index.yaml | yq '.entries["$(CHART_NAME)"][0].version' | tr -d '"'); \
 	if [ -z "$$LATEST_VERSION" ]; then \
 		echo "❌ No se pudo obtener la versión remota desde $(REPO_URL)/index.yaml"; exit 1; \

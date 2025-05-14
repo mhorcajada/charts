@@ -63,8 +63,6 @@ add-repo: ## 🔗 Añade el repositorio Helm mhorcajada y actualiza el índice
 	@helm repo update || true
 
 update-readme-version: ## 📝 Sustituye versión en README.md si CHART_VERSION > LATEST_VERSION
-	@git config user.name "github-actions"
-	@git config user.email "github-actions@github.com"
 	@LATEST_VERSION=$$(curl -s $(REPO_URL)/index.yaml | yq '.entries["$(CHART_NAME)"][0].version' | tr -d '"'); \
 	if [ -z "$$LATEST_VERSION" ]; then \
 		echo "❌ No se pudo obtener la versión remota desde $(REPO_URL)/index.yaml"; exit 1; \
@@ -88,6 +86,8 @@ save-artifacts: ## 💾 Copia .tgz, index y README.md al directorio temporal
 	cp README.md $(DIST_DIR)/
 
 push-main: ## ⬆️  Sube el release a main si hay cambios antes de saltar a gh-pages
+	@git config user.name "github-actions"
+	@git config user.email "github-actions@github.com"
 	git add README.md
 	git add storj-gateway/Chart.yaml
 	git add storj-gateway/README.md
@@ -95,6 +95,8 @@ push-main: ## ⬆️  Sube el release a main si hay cambios antes de saltar a gh
 
 push-gh-pages: ## 🚀 Sube a gh-pages los artefactos necesarios
 	@echo "🚀 Subiendo $(CHART_NAME)-$(CHART_VERSION).tgz al branch gh-pages..."
+	@git config user.name "github-actions"
+	@git config user.email "github-actions@github.com"
 	@git checkout gh-pages
 	mv $(DIST_DIR)/$(CHART_NAME)-$(CHART_VERSION).tgz .
 	mv $(DIST_DIR)/README.md .

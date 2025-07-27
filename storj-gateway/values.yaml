@@ -141,6 +141,12 @@ volumeMounts:
   - mountPath: /root/.local/share/storj/gateway
     name: storj-config
 
+# Compatibilidad con Projected Volumes por vault audience
+vault:
+  enabled: false
+  annotations: {}
+  projectedVolumes: []
+
 # Configuración del Service asociado al Deployment
 service:
   enabled: true

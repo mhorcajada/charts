@@ -123,7 +123,7 @@ spec:
             {{- toYaml .Values.volumeMounts | nindent 12 }}
           {{- end }}
       volumes:
-      {{- if .Values.vault.enabled }}
+      {{- if and (hasKey .Values "vault") .Values.vault.enabled }}
         {{- range .Values.vault.projectedVolumes }}
         - name: {{ .name }}
           projected:

@@ -122,6 +122,14 @@ spec:
           volumeMounts:
             {{- toYaml .Values.volumeMounts | nindent 12 }}
           {{- end }}
+      volumes:
+      {{- if .Values.vault.enabled }}
+        {{- range .Values.vault.projectedVolumes }}
+        - name: {{ .name }}
+          projected:
+            {{- toYaml .sources | nindent 12 }}
+        {{- end }}
+      {{- end }}
       {{- if and .Values.persistence.enabled (or .Values.persistence.existingClaim .Values.persistence.create) }}
       volumes:
         - name: storj-config

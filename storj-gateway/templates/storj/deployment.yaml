@@ -127,6 +127,7 @@ spec:
         {{- range .Values.vault.projectedVolumes }}
         - name: {{ .name }}
           projected:
+            sources:
             {{- toYaml .sources | nindent 12 }}
         {{- end }}
       {{- end }}

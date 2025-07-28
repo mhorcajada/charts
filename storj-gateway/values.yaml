@@ -143,9 +143,18 @@ volumeMounts:
 
 # Compatibilidad con Projected Volumes por vault audience
 vault:
-  enabled: false
-  annotations: {}
-  projectedVolumes: []
+  enabled: true
+  annotations:
+    vault.hashicorp.com/agent-inject: 'true'
+    vault.hashicorp.com/agent-service-account-token-volume-name: 'vault-token'
+    # ... resto de annotations
+  projectedVolumes:
+    - name: vault-token
+      sources:
+        - serviceAccountToken:
+            path: token
+            expirationSeconds: 7200
+            audience: vault
 
 # Configuración del Service asociado al Deployment
 service:

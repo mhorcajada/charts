@@ -21,7 +21,7 @@ image:
 
 vault:
   enabled: true
-  agentImage: hashicorp/vault:1.19.3
+  agentImage: hashicorp/vault:1.20.1@sha256:50e1ecbe385742293c4a7e18c90f55d4dcc39724a05c6ab35933305fe7622cf3
   caCertPath: /run/secrets/kubernetes.io/serviceaccount/ca.crt
   role: storj-gateway
   secretPath: internal/data/storj-gateway/config

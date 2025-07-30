@@ -80,7 +80,7 @@ podAnnotations:
 # Configuración de integración con HashiCorp Vault
 vault:
   enabled: true  # Activa modo Vault
-  agentImage: hashicorp/vault:1.19.3  # Imagen del agente de Vault sidecar
+  agentImage: hashicorp/vault:1.20.1@sha256:50e1ecbe385742293c4a7e18c90f55d4dcc39724a05c6ab35933305fe7622cf3  # Imagen del agente de Vault sidecar
   caCertPath: /run/secrets/kubernetes.io/serviceaccount/ca.crt  # Ruta del certificado raíz
   role: storj-gateway  # Rol de Vault para autenticación del pod (Kubernetes Auth)
   secretPath: internal/data/storj-gateway/config  # Ruta secreta en Vault (KV v2)

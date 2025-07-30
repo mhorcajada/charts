@@ -16,7 +16,7 @@ fullnameOverride: "storj-test"
 
 image:
   repository: docker.io/storjlabs/gateway
-  tag: 1d044e7-v1.10.0-go1.23.4
+  tag: 5359faa-v1.11.0-go1.25rc2@sha256:dfefab10db3aa5f2a785e49f2a897e63226d00fdd1642ba69ffa4f94b0db6ebe
   pullPolicy: Always
 
 vault:

@@ -30,7 +30,7 @@ fullnameOverride: "storj-test"
 # Imagen oficial del gateway de Storj
 image:
   repository: docker.io/storjlabs/gateway
-  tag: 1d044e7-v1.10.0-go1.23.4
+  tag: 5359faa-v1.11.0-go1.25rc2@sha256:dfefab10db3aa5f2a785e49f2a897e63226d00fdd1642ba69ffa4f94b0db6ebe
   pullPolicy: Always
   # Repositorio oficial de la imagen
   # tag versión específica y determinista
@@ -80,7 +80,7 @@ podAnnotations:
 # Configuración de integración con HashiCorp Vault
 vault:
   enabled: true  # Activa modo Vault
-  agentImage: hashicorp/vault:1.19.3  # Imagen del agente de Vault sidecar
+  agentImage: hashicorp/vault:1.20.1@sha256:50e1ecbe385742293c4a7e18c90f55d4dcc39724a05c6ab35933305fe7622cf3  # Imagen del agente de Vault sidecar
   caCertPath: /run/secrets/kubernetes.io/serviceaccount/ca.crt  # Ruta del certificado raíz
   role: storj-gateway  # Rol de Vault para autenticación del pod (Kubernetes Auth)
   secretPath: internal/data/storj-gateway/config  # Ruta secreta en Vault (KV v2)
@@ -179,6 +179,21 @@ volumeMounts:
   - mountPath: /root/.local/share/storj/gateway
     name: storj-config
 
+# Compatibilidad con Projected Volumes por vault audience
+vault:
+  enabled: true
+  annotations:
+    vault.hashicorp.com/agent-inject: 'true'
+    vault.hashicorp.com/agent-service-account-token-volume-name: 'vault-token'
+    # ... resto de annotations
+  projectedVolumes:
+    - name: vault-token
+      sources:
+        - serviceAccountToken:
+            path: token
+            expirationSeconds: 7200
+            audience: vault
+
 # Servicio expone el puerto del gateway Storj (7777) dentro del clúster
 service:
   enabled: true
@@ -215,7 +230,7 @@ webUi:
 
   image:
     repository: machines/filestash
-    tag: "latest@sha256:7fd7a33a0a0e8c724b5180d4d1732dd41d0525ead8d4509e37f93d83b33eaf52"
+    tag: "latest@sha256:cd66b79e335aeab9f34c314e4a21c9ae4dd68b94fa9080f5e4f4856f81f3f380"
 
   ingress:
     enabled: true

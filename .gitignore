@@ -29,3 +29,5 @@ index.yaml
 # CHANGELOG.md
 CHANGELOG.md
 
+openapi-mcp-generator/
+.gitignore

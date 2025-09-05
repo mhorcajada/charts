@@ -16,22 +16,16 @@ dnsPolicy: ClusterFirst
 # Planificador usado para la asignación del pod al nodo
 schedulerName: default-scheduler
 
-# Estrategia de actualización rolling (actualización progresiva de pods)
-strategy:
-  type: RollingUpdate
-  rollingUpdate:
-    maxSurge: 25%         # Máximo de pods adicionales sobre el número deseado
-    maxUnavailable: 25%   # Máximo de pods no disponibles durante la actualización
-
+# Estrategia de actualización rolling blueGreen (actualización rollout de pods)
 rollout:
-  enabled: false
+  enabled: true
   strategy:
     autoPromotionEnabled: false
     autoPromotionSeconds: 0
     scaleDownDelaySeconds: 30
     previewReplicaCount: 1
-    activeService: ""   # se puede dejar en blanco: Helm lo genera automáticamente
-    previewService: ""  # se puede dejar en blanco: Helm lo genera automáticamente  
+    activeService: ""   # storj-gateway-active, se puede dejar en blanco: Helm lo genera automáticamente
+    previewService: ""  # storj-gateway-preview,se puede dejar en blanco: Helm lo genera automáticamente
 
 # Sobrescriben los nombres automáticos generados por Helm
 nameOverride: "storj"
@@ -40,7 +34,7 @@ fullnameOverride: "storj-test"
 # Imagen oficial del gateway de Storj
 image:
   repository: docker.io/storjlabs/gateway
-  tag: 5359faa-v1.11.0-go1.25rc2@sha256:dfefab10db3aa5f2a785e49f2a897e63226d00fdd1642ba69ffa4f94b0db6ebe
+  tag: 1d044e7-v1.10.0-go1.23.4
   pullPolicy: Always
   # Repositorio oficial de la imagen
   # tag versión específica y determinista
@@ -159,49 +153,12 @@ volumeMounts:
   - mountPath: /root/.local/share/storj/gateway
     name: storj-config
 
-# Compatibilidad con Projected Volumes por vault audience
-vault:
-  enabled: true
-  annotations:
-    vault.hashicorp.com/agent-inject: 'true'
-    vault.hashicorp.com/agent-service-account-token-volume-name: 'vault-token'
-    # ... resto de annotations
-  projectedVolumes:
-    - name: vault-token
-      sources:
-        - serviceAccountToken:
-            path: token
-            expirationSeconds: 7200
-            audience: vault
-
 # Configuración del Service asociado al Deployment
 service:
   enabled: true
   type: ClusterIP                           # Tipo de servicio: ClusterIP, NodePort o LoadBalancer
   port: 7777                                # Puerto externo expuesto
   targetPort: 7777                          # Puerto del contenedor (interno)
-
-# Configura la sonda de liveness para detectar si el contenedor necesita reiniciarse
-livenessProbe:
-  enabled: true
-  httpGet:
-    path: /minio/health/live
-    port: 7777
-  initialDelaySeconds: 15
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 5
-
-# Configura la sonda de readiness para saber cuándo el contenedor está listo para recibir tráfico
-readinessProbe:
-  enabled: true
-  httpGet:
-    path: /minio/health/ready
-    port: 7777
-  initialDelaySeconds: 15
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 5
 
 # === MODO WebUI: webUi.enabled: true habilita la interfaz web para gestión de ficheros en Storj ===
 webUi:
@@ -210,7 +167,7 @@ webUi:
 
   image:
     repository: machines/filestash
-    tag: "latest@sha256:cd66b79e335aeab9f34c314e4a21c9ae4dd68b94fa9080f5e4f4856f81f3f380"
+    tag: "latest@sha256:7fd7a33a0a0e8c724b5180d4d1732dd41d0525ead8d4509e37f93d83b33eaf52"
 
   ingress:
     enabled: true
@@ -220,28 +177,6 @@ webUi:
       enabled: true              # true para TLS, false para HTTP plano
       issuer: vault-issuer       # Issuer de cert-manager (e.g. vault-issuer, letsencrypt-prod)
       secretName: filestash-tls  # Nombre del Secret TLS
-
-  # Configura la sonda de liveness para detectar si el contenedor necesita reiniciarse
-  livenessProbe:
-    enabled: true
-    httpGet:
-      path: /healthz
-      port: 8334
-    initialDelaySeconds: 15
-    periodSeconds: 10
-    timeoutSeconds: 10
-    failureThreshold: 5
-
-  # Configura la sonda de readiness para saber cuándo el contenedor está listo para recibir tráfico
-  readinessProbe:
-    enabled: true
-    httpGet:
-      path: /healthz
-      port: 8334
-    initialDelaySeconds: 15
-    periodSeconds: 10
-    timeoutSeconds: 10
-    failureThreshold: 5
 
   persistence:
     enabled: true

@@ -1,5 +1,10 @@
+{{- if .Values.rollout.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+{{- else }}
 apiVersion: apps/v1
 kind: Deployment
+{{- end }}
 metadata:
   name: {{ include "storj-gateway.fullname" . }}
   namespace: {{ .Release.Namespace }}
@@ -12,10 +17,20 @@ spec:
   selector:
     matchLabels:
       {{- include "storj-gateway.selectorLabels" . | nindent 6 }}
+{{- if .Values.rollout.enabled }}
+  strategy:
+    blueGreen:
+      activeService: {{ include "storj-gateway.fullname" . }}-active
+      previewService: {{ include "storj-gateway.fullname" . }}-preview
+      autoPromotionEnabled: {{ .Values.rollout.strategy.autoPromotionEnabled | default false }}
+      autoPromotionSeconds: {{ .Values.rollout.strategy.autoPromotionSeconds | default 0 }}
+      scaleDownDelaySeconds: {{ .Values.rollout.strategy.scaleDownDelaySeconds | default 30 }}
+      previewReplicaCount: {{ .Values.rollout.strategy.previewReplicaCount | default 1 }}
+{{- else }}
   {{- if and (hasKey .Values "strategy") (hasKey .Values.strategy "type") }}
   strategy:
     type: {{ .Values.strategy.type }}
-    {{- if and (hasKey .Values.strategy "rollingUpdate") }}
+    {{- if .Values.strategy.rollingUpdate }}
     rollingUpdate:
       {{- if .Values.strategy.rollingUpdate.maxSurge }}
       maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
@@ -25,6 +40,7 @@ spec:
       {{- end }}
     {{- end }}
   {{- end }}
+{{- end }}
   template:
     metadata:
     {{- with .Values.podAnnotations }}

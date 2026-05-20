@@ -36,6 +36,8 @@ image:
   # tag versión específica y determinista
   # Política de descarga: Always, IfNotPresent o Never
 
+imagePullSecrets: []
+
 # === MODO 1: Configuración mediante configMap + initContainer ===
 # ConfigMap habilitado como fuente de configuración para storj
 # Se monta en solo lectura y luego se copia sobre el PVC desde un initContainer
